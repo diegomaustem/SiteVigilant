@@ -15,7 +15,7 @@ export interface CreatedMonitor {
     updatedAt: Date;
 }
 
-export interface ListCreatedMonitor {
+export interface ListMonitors {
     id: number;
     periodicity_id: number;
     name: string;

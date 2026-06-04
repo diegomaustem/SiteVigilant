@@ -9,7 +9,7 @@ import { periodicityController } from '../config/container.js';
 const router: Router = Router();
 
 router.get('/health', (req: Request, res: Response) => {
-  res.status(200).json({ status: 'OK', timestamp: new Date() });
+  res.status(200).json({ status: 'API running', timestamp: new Date() });
 });
 
 router.get('/list-monitors', monitorController.getAll);

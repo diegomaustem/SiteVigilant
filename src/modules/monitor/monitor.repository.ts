@@ -1,5 +1,5 @@
 import type { Knex } from 'knex';
-import type { CreatedMonitor, InputMonitor, ListCreatedMonitor } from './monitor.types.js';
+import type { CreatedMonitor, InputMonitor, ListMonitors } from './monitor.types.js';
 
 export class MonitorRepository {
   private db: Knex;
@@ -9,9 +9,9 @@ export class MonitorRepository {
     this.db = db;
   }
 
-  async getAll(): Promise<ListCreatedMonitor[]>{
+  async getAll(): Promise<ListMonitors[]>{
     try {
-      return await this.db<ListCreatedMonitor>(this.monitorTable).select('*');
+      return await this.db<ListMonitors>(this.monitorTable).select('*');
     } catch (error: any) {
       console.error(`[MonitorRepository.getActiveMonitors] Erro ao buscar monitores: ${error.message}`);
       throw error;

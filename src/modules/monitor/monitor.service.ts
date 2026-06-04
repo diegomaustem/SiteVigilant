@@ -1,5 +1,5 @@
 import { MonitorRepository } from './monitor.repository.js';
-import type { InputMonitor, CreatedMonitor, ListCreatedMonitor } from './monitor.types.js';
+import type { InputMonitor, CreatedMonitor, ListMonitors } from './monitor.types.js';
 
 export class MonitorService {
 
@@ -9,7 +9,7 @@ export class MonitorService {
     this.monitorRepository = monitorRepository;
   }
 
-  async getAll(): Promise<ListCreatedMonitor[]> { 
+  async getAll(): Promise<ListMonitors[]> { 
     return await this.monitorRepository.getAll();
   }
 

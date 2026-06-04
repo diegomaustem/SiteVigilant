@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.ts"
+    "start": "node dist/server.ts",
+    "knex": "NODE_OPTIONS='--import tsx' knex"
   },
   "repository": {
     "type": "git",
@@ -24,7 +25,9 @@
     "axios": "^1.16.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "node-cron": "^4.2.1"
+    "knex": "^3.2.10",
+    "node-cron": "^4.2.1",
+    "pg": "^8.21.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

@@ -10,7 +10,8 @@
     "target": "es2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "rootDir": "./src",
+    // "rootDir": "./src",
+    "rootDirs": [".", "./src"],
     "outDir": "./dist",
     "types": [],
     // For nodejs:

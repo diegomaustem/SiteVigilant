@@ -10,19 +10,27 @@ export class MonitorController {
     }
 
     getAll = async (req: Request, res: Response): Promise<void> => {
-        const monitors = await this.monitorService.getAll();
-        res.status(200).json({ success: true, data: monitors });
+        try {
+            const monitors = await this.monitorService.getAll();
+            res.status(200).json({ success: true, data: monitors });
+        } catch (error: any) {
+            res.status(500).json({ success: false, error: error.message });
+        }
     }
 
     create = async (req: Request, res: Response): Promise<void> => {
-        const monitorData : InputMonitor = {
-            periodicityId: req.body.periodicityId,
-            name: req.body.name,
-            description: req.body.description,
-            url: req.body.url
-        };
+        try {
+            const monitorData : InputMonitor = {
+                periodicityId: req.body.periodicityId,
+                name: req.body.name,
+                description: req.body.description,
+                url: req.body.url
+            };
 
-        const createdMonitor = await this.monitorService.create(monitorData); 
-        res.status(201).json({ success: true, data: createdMonitor });
+            const createdMonitor = await this.monitorService.create(monitorData); 
+            res.status(201).json({ success: true, data: createdMonitor });
+        } catch (error: any) {
+            res.status(500).json({ success: false, error: error.message });
+        }
     }   
 }

@@ -18,6 +18,27 @@ export class MonitorRepository {
     }
   }
 
+  async getById(id: number): Promise<CreatedMonitor | undefined> {
+    try {
+      const monitor = await this.db(this.monitorTable)
+        .where({ id })
+        .first();
+      if (!monitor) return undefined;
+      return {
+        id: monitor.id,
+        periodicityId: monitor.periodicity_id,
+        name: monitor.name,
+        description: monitor.description,
+        url: monitor.url,
+        createdAt: monitor.created_at,
+        updatedAt: monitor.updated_at,
+      };
+    } catch (error: any) {
+      console.error(`[MonitorRepository.getById] Erro ao buscar monitor por id: ${error.message}`);
+      throw error;
+    }
+  }
+
   async getByName(name: string): Promise<Monitor | undefined> {
     try {
       const monitor = await this.db(this.monitorTable)

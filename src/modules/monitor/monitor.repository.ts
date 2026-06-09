@@ -1,5 +1,5 @@
 import type { Knex } from 'knex';
-import type { CreatedMonitor, InputMonitor, ListMonitors } from './monitor.types.js';
+import type { CreatedMonitor, InputMonitor, ListMonitors, Monitor } from './monitor.types.js';
 
 export class MonitorRepository {
   private db: Knex;
@@ -14,6 +14,29 @@ export class MonitorRepository {
       return await this.db<ListMonitors>(this.monitorTable).select('*');
     } catch (error: any) {
       console.error(`[MonitorRepository.getActiveMonitors] Erro ao buscar monitores: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async getByName(name: string): Promise<Monitor | undefined> {
+    try {
+      const monitor = await this.db(this.monitorTable)
+        .where('name', name)
+        .first();
+
+      if (!monitor) return undefined;
+
+      return {
+        id: monitor.id,
+        periodicityId: monitor.periodicity_id,
+        name: monitor.name,
+        description: monitor.description,
+        url: monitor.url,
+        createdAt: monitor.created_at,
+        updatedAt: monitor.updated_at,
+      };
+    } catch (error: any) {
+      console.error(`[MonitorRepository.getByName] Erro ao buscar monitor por nome: ${error.message}`);
       throw error;
     }
   }

@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { MonitorService } from './monitor.service.js';
 import type { InputMonitor } from './monitor.types.js'; 
+import { BadRequestError } from '../../utils/errors.js';
 
 export class MonitorController {
     private readonly monitorService: MonitorService;
@@ -12,6 +13,15 @@ export class MonitorController {
     getAll = async (req: Request, res: Response): Promise<void> => {
         const monitors = await this.monitorService.getAll();
         res.status(200).json({ success: true, data: monitors });
+    }
+
+    getById = async (req: Request, res: Response): Promise<void> => {
+        const id = Number(req.params.id);
+        if (isNaN(id) || id <= 0) {
+            throw new BadRequestError('ID inválido. Deve ser um número inteiro.');
+        }
+        const monitor = await this.monitorService.getById(id);
+        res.status(200).json({ success: true, data: monitor });
     }
 
     create = async (req: Request, res: Response): Promise<void> => {

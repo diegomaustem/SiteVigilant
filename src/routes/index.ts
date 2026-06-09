@@ -14,6 +14,7 @@ router.get('/health', (req: Request, res: Response) => {
 });
 
 router.get('/list-monitors', asyncHandler(monitorController.getAll));
+router.get('/list-monitor/:id', asyncHandler(monitorController.getById));
 router.post('/create-monitor', MonitorValidator.validateCheckInput, asyncHandler(monitorController.create));
 
 router.get('/list-periodicities', periodicityController.getAll); 

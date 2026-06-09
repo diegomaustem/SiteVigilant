@@ -19,22 +19,18 @@ export const errorHandler = (
   ) {
     status = 400;
     message = 'Dados inválidos ou mal formatados.';
-  }
-
-  if (
+  } 
+  else if (
     err.code === '23505' ||
-    err.code === '23503'    
+    err.code === '23503' 
   ) {
     status = 409;
     message = 'Conflito: recurso já existe ou referência inválida.';
   }
 
-
-
-  // Resposta amigável para o cliente
   res.status(status).json({
     success: false,
-    message: err.message || 'Erro interno do servidor',
+    message,
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 };

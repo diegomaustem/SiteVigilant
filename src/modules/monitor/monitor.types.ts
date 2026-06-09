@@ -24,3 +24,13 @@ export interface ListMonitors {
     created_at : Date;
     updated_at: Date;
 }
+
+export interface Monitor {
+    id: number;
+    periodicityId: number;
+    name: string;
+    description: string;
+    url: string;
+    createdAt : Date;
+    updatedAt: Date;
+}

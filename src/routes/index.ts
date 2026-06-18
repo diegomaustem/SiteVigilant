@@ -6,6 +6,7 @@ import { monitorController } from '../config/container.js';
 import { MonitorValidator } from '../middlewares/monitor-validator.middleware.js';
 
 import { periodicityController } from '../config/container.js';
+import { PeriodicityValidator } from '../middlewares/periodicity-validator.middleware.js';
 
 const router: Router = Router();
 
@@ -17,7 +18,8 @@ router.get('/list-monitors', asyncHandler(monitorController.getAll));
 router.get('/list-monitor/:id', asyncHandler(monitorController.getById));
 router.post('/create-monitor', MonitorValidator.validateCheckInput, asyncHandler(monitorController.create));
 
-router.get('/list-periodicities', periodicityController.getAll); 
-router.post('/create-periodicity', periodicityController.create);
+router.get('/list-periodicities', asyncHandler(periodicityController.getAll));
+router.get('/list-periodicity/:id', asyncHandler(monitorController.getById)); 
+router.post('/create-periodicity', PeriodicityValidator.validateCheckInput, asyncHandler(periodicityController.create));
 
 export default router;

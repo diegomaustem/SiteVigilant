@@ -19,7 +19,7 @@ router.get('/list-monitor/:id', asyncHandler(monitorController.getById));
 router.post('/create-monitor', MonitorValidator.validateCheckInput, asyncHandler(monitorController.create));
 
 router.get('/list-periodicities', asyncHandler(periodicityController.getAll));
-router.get('/list-periodicity/:id', asyncHandler(monitorController.getById)); 
+router.get('/list-periodicity/:id', asyncHandler(periodicityController.getById)); 
 router.post('/create-periodicity', PeriodicityValidator.validateCheckInput, asyncHandler(periodicityController.create));
 
 export default router;

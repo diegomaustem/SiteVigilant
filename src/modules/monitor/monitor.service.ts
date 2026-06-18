@@ -1,6 +1,6 @@
 import { ConflictError, NotFoundError } from '../../utils/errors.js';
 import { MonitorRepository } from './monitor.repository.js';
-import type { InputMonitor, CreatedMonitor, ListMonitors, Monitor } from './monitor.types.js';
+import type { InputMonitor, Monitor } from './monitor.types.js';
 export class MonitorService {
 
   private readonly monitorRepository: MonitorRepository;
@@ -9,7 +9,7 @@ export class MonitorService {
     this.monitorRepository = monitorRepository;
   }
 
-  async getAll(): Promise<ListMonitors[]> { 
+  async getAll(): Promise<Monitor[]> { 
     return await this.monitorRepository.getAll();
   }
 
@@ -21,7 +21,7 @@ export class MonitorService {
     return monitor;
   }
 
-  async create(inputMonitor: InputMonitor): Promise<CreatedMonitor> {
+  async create(inputMonitor: InputMonitor): Promise<Monitor> {
     try {
       const existingMonitor = await this.monitorRepository.getByName(inputMonitor.name); 
       if (existingMonitor) {

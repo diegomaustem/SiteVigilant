@@ -4,6 +4,11 @@ import type { InputLog, Log } from '../modules/logs/log.types.js';
 import type { Monitor } from '../modules/monitor/monitor.types.js';
 import type { PeriodicityRepository } from '../modules/periodicity/periodicity.repository.js';
 
+export interface CheckResult {
+  log: Log;           // log atualizado ou existente
+  wasChecked: boolean; // true se houve nova requisição, false se reutilizou log existente
+}
+
 export class UrlConsultantService {
   private readonly logRepository: LogRepository;
   private readonly periodicityRepository: PeriodicityRepository
@@ -13,7 +18,7 @@ export class UrlConsultantService {
     this.periodicityRepository = periodicityRepository;
   }
 
-  async checkAddress(monitor: Monitor): Promise<InputLog | Log> {
+  async checkAddress(monitor: Monitor): Promise<CheckResult> {
     const monitorLog = await this.logRepository.getLogByMonitorId(monitor.id);
 
     if(monitorLog) {
@@ -30,7 +35,7 @@ export class UrlConsultantService {
       const shouldRun = this.shouldRunCheck(monitorLog.checkedAt, periodicity.time);
 
       if (!shouldRun) {
-        return monitorLog;
+        return { log: monitorLog, wasChecked: false };
       }
     }
 
@@ -77,7 +82,8 @@ export class UrlConsultantService {
       }
     }
 
-    return await this.logRepository.upsert(logData); 
+    const savedLog = await this.logRepository.upsert(logData); 
+    return { log: savedLog, wasChecked: true };
   }
 
   private shouldRunCheck(monitorCheckedAt: Date | null, periodicityTime: string): boolean {

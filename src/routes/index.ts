@@ -1,25 +1,32 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { asyncHandler } from '../middlewares/async-handler.js';
+import { authMiddleware } from '../middlewares/auth.middleware.js';
+import { loginLimiter, registerLimiter } from '../middlewares/rate-limit.middleware.js';
+import { AuthValidator } from '../middlewares/auth-validator.middleware.js';
 
-import { monitorController } from '../config/container.js';
+import { authController, monitorController } from '../config/container.js';
 import { MonitorValidator } from '../middlewares/monitor-validator.middleware.js';
-
 import { periodicityController } from '../config/container.js';
 import { PeriodicityValidator } from '../middlewares/periodicity-validator.middleware.js';
+import { authService } from '../config/container.js';
 
+const authGuard = authMiddleware(authService);
 const router: Router = Router();
 
-router.get('/health', (req: Request, res: Response) => {
+router.get('/status', (req: Request, res: Response) => {
   res.status(200).json({ status: 'API running', timestamp: new Date() });
 });
 
-router.get('/list-monitors', asyncHandler(monitorController.getAll));
-router.get('/list-monitor/:id', asyncHandler(monitorController.getById));
-router.post('/create-monitor', MonitorValidator.validateCheckInput, asyncHandler(monitorController.create));
+router.post('/register', registerLimiter, AuthValidator.validateRegister, asyncHandler(authController.register));
+router.post('/login', loginLimiter, AuthValidator.validateLogin, asyncHandler(authController.login));
 
-router.get('/list-periodicities', asyncHandler(periodicityController.getAll));
-router.get('/list-periodicity/:id', asyncHandler(periodicityController.getById)); 
-router.post('/create-periodicity', PeriodicityValidator.validateCheckInput, asyncHandler(periodicityController.create));
+router.get('/list-monitors', authGuard, asyncHandler(monitorController.getAll));
+router.get('/list-monitor/:id', authGuard, asyncHandler(monitorController.getById));
+router.post('/create-monitor', authGuard, MonitorValidator.validateCheckInput, asyncHandler(monitorController.create));
+
+router.get('/list-periodicities', authGuard, asyncHandler(periodicityController.getAll));
+router.get('/list-periodicity/:id', authGuard, asyncHandler(periodicityController.getById)); 
+router.post('/create-periodicity', authGuard, PeriodicityValidator.validateCheckInput, asyncHandler(periodicityController.create));
 
 export default router;

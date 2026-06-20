@@ -9,6 +9,9 @@ import { PeriodicityService } from '../modules/periodicity/periodicity.service.j
 import { PeriodicityController } from '../modules/periodicity/periodicity.controller.js';
 import { UrlConsultantService } from '../services/url-consultant.service.js';
 import { LogRepository } from '../modules/logs/log.repository.js';
+import { UserRepository } from '../modules/user/user.repository.js';
+import { AuthService } from '../modules/auth/auth.service.js';
+import { AuthController } from '../modules/auth/auth.controller.js';
 
 class DependencyContainer {
   private static dbCache: Knex | null = null;
@@ -23,6 +26,10 @@ class DependencyContainer {
 
   private static urlConsultantServiceCache: UrlConsultantService | null = null;
   private static logRepositoryCache: LogRepository | null = null;
+
+  private static userRepositoryCache: UserRepository | null = null;
+  private static authServiceCache: AuthService | null = null;
+  private static authControllerCache: AuthController | null = null;
 
   public static get db(): Knex {
     if (!this.dbCache) {
@@ -92,6 +99,27 @@ class DependencyContainer {
     return this.urlConsultantServiceCache;
   }
 
+  public static get userRepository(): UserRepository {
+    if (!this.userRepositoryCache) {
+      this.userRepositoryCache = new UserRepository(this.db);
+    }
+    return this.userRepositoryCache;
+  }
+
+  public static get authService(): AuthService {
+    if (!this.authServiceCache) {
+      this.authServiceCache = new AuthService(this.userRepository);
+    }
+    return this.authServiceCache;
+  }
+
+  public static get authController(): AuthController {
+    if (!this.authControllerCache) {
+      this.authControllerCache = new AuthController(this.authService);
+    }
+    return this.authControllerCache;
+  }
+
   public static async destroyDb(): Promise<void> {
     if (this.dbCache) {
       await this.dbCache.destroy();
@@ -110,5 +138,9 @@ export const periodicityService    = DependencyContainer.periodicityService;
 export const periodicityRepository = DependencyContainer.periodicityRepository;
 
 export const urlConsultantService = DependencyContainer.urlConsultantService;
+
+export const authController = DependencyContainer.authController;
+export const authService = DependencyContainer.authService;
+export const userRepository = DependencyContainer.userRepository;
 
 export default DependencyContainer;

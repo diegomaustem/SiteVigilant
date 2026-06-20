@@ -3,12 +3,12 @@ import type { Request, Response } from 'express';
 import { asyncHandler } from '../middlewares/async-handler.js';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
 import { loginLimiter, registerLimiter } from '../middlewares/rate-limit.middleware.js';
-import { AuthValidator } from '../middlewares/auth-validator.middleware.js';
+import { AuthValidator } from '../validators/auth-validator.js';
 
 import { authController, monitorController } from '../config/container.js';
-import { MonitorValidator } from '../middlewares/monitor-validator.middleware.js';
+import { MonitorValidator } from '../validators/monitor-validator.js';
 import { periodicityController } from '../config/container.js';
-import { PeriodicityValidator } from '../middlewares/periodicity-validator.middleware.js';
+import { PeriodicityValidator } from '../validators/periodicity-validator.js';
 import { authService } from '../config/container.js';
 
 const authGuard = authMiddleware(authService);

@@ -11,9 +11,18 @@ export class MonitorRepository {
 
   async getAll(): Promise<Monitor[]>{
     try {
-      return await this.db<Monitor>(this.monitorTable).select('*');
+      const monitors = await this.db(this.monitorTable).select('*');
+      return monitors.map(monitor => ({
+        id: monitor.id,
+        periodicityId: monitor.periodicity_id,
+        name: monitor.name,
+        description: monitor.description,
+        url: monitor.url,
+        createdAt: monitor.created_at,
+        updatedAt: monitor.updated_at,
+      }));
     } catch (error: any) {
-      console.error(`[MonitorRepository.getActiveMonitors] Erro ao buscar monitores: ${error.message}`);
+      console.error(`[MonitorRepository.getAll] Erro ao buscar monitores: ${error.message}`);
       throw error;
     }
   }

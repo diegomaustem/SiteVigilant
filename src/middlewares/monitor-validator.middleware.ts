@@ -2,7 +2,17 @@ import type { Request, Response, NextFunction } from 'express';
 
 export class MonitorValidator {
   static validateCheckInput(req: Request, res: Response, next: NextFunction): void {
-    const { periodicityId, name, description, url } = req.body;
+    const { userId, periodicityId, name, description, url } = req.body;
+
+    if(userId === undefined) {
+      res.status(400).json({ success: false, error: 'O campo "user_id" é obrigatório.' });
+      return;
+    }
+
+     if (typeof userId !== 'number' || isNaN(userId)) {
+      res.status(400).json({ success: false, error: 'O campo "user_id" deve ser um número válido.' });
+      return;
+    }
 
     if (periodicityId === undefined) {
       res.status(400).json({ success: false, error: 'O campo "periodicity_id" é obrigatório.' });

@@ -7,6 +7,8 @@ import { MonitorController } from '../modules/monitor/monitor.controller.js';
 import { PeriodicityRepository } from '../modules/periodicity/periodicity.repository.js';
 import { PeriodicityService } from '../modules/periodicity/periodicity.service.js';
 import { PeriodicityController } from '../modules/periodicity/periodicity.controller.js';
+import { UrlConsultantService } from '../services/url-consultant.service.js';
+import { LogRepository } from '../modules/logs/log.repository.js';
 
 class DependencyContainer {
   private static dbCache: Knex | null = null;
@@ -18,6 +20,9 @@ class DependencyContainer {
   private static periodicityServiceCache: PeriodicityService | null = null;
   private static periodicityControllerCache: PeriodicityController | null = null;
   private static periodicityRepositoryCache: PeriodicityRepository | null = null;
+
+  private static urlConsultantServiceCache: UrlConsultantService | null = null;
+  private static logRepositoryCache: LogRepository | null = null;
 
   public static get db(): Knex {
     if (!this.dbCache) {
@@ -40,7 +45,7 @@ class DependencyContainer {
 
   public static get monitorService(): MonitorService {
     if (!this.monitorServiceCache) {
-        this.monitorServiceCache = new MonitorService(this.monitorRepository);
+      this.monitorServiceCache = new MonitorService(this.monitorRepository);
     }
     return this.monitorServiceCache;
   }
@@ -73,6 +78,20 @@ class DependencyContainer {
     return this.periodicityControllerCache;
   }
 
+  public static get logRepository(): LogRepository {
+    if (!this.logRepositoryCache) {
+      this.logRepositoryCache = new LogRepository(this.db);
+    }
+    return this.logRepositoryCache;
+  }
+
+  public static get urlConsultantService(): UrlConsultantService {
+    if (!this.urlConsultantServiceCache) {
+      this.urlConsultantServiceCache = new UrlConsultantService(this.logRepository, this.periodicityRepository);
+    }
+    return this.urlConsultantServiceCache;
+  }
+
   public static async destroyDb(): Promise<void> {
     if (this.dbCache) {
       await this.dbCache.destroy();
@@ -89,5 +108,7 @@ export const monitorRepository  = DependencyContainer.monitorRepository;
 export const periodicityController = DependencyContainer.periodicityController;
 export const periodicityService    = DependencyContainer.periodicityService;
 export const periodicityRepository = DependencyContainer.periodicityRepository;
+
+export const urlConsultantService = DependencyContainer.urlConsultantService;
 
 export default DependencyContainer;

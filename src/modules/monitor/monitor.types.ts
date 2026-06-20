@@ -1,4 +1,5 @@
 export interface InputMonitor {
+    userId: number;
     periodicityId: number;
     name: string;
     description: string;
@@ -7,6 +8,7 @@ export interface InputMonitor {
 
 export interface Monitor {
     id: number;
+    userId: number;
     periodicityId: number;
     name: string;
     description: string;

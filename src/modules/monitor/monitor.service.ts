@@ -1,4 +1,4 @@
-import { ConflictError, NotFoundError } from '../../utils/errors.js';
+import { ConflictError, NotFoundError, UnauthorizedError } from '../../utils/errors.js';
 import { MonitorRepository } from './monitor.repository.js';
 import type { InputMonitor, Monitor } from './monitor.types.js';
 export class MonitorService {

@@ -26,6 +26,7 @@ export class MonitorController {
 
     create = async (req: Request, res: Response): Promise<void> => {
         const monitorData : InputMonitor = {
+            userId: req.body.userId,
             periodicityId: req.body.periodicityId,
             name: req.body.name,
             description: req.body.description,

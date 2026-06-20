@@ -14,6 +14,7 @@ export class MonitorRepository {
       const monitors = await this.db(this.monitorTable).select('*');
       return monitors.map(monitor => ({
         id: monitor.id,
+        userId: monitor.user_id,
         periodicityId: monitor.periodicity_id,
         name: monitor.name,
         description: monitor.description,
@@ -35,6 +36,7 @@ export class MonitorRepository {
       if (!monitor) return undefined;
       return {
         id: monitor.id,
+        userId: monitor.user_id,
         periodicityId: monitor.periodicity_id,
         name: monitor.name,
         description: monitor.description,
@@ -58,6 +60,7 @@ export class MonitorRepository {
 
       return {
         id: monitor.id,
+        userId: monitor.user_id,
         periodicityId: monitor.periodicity_id,
         name: monitor.name,
         description: monitor.description,
@@ -75,6 +78,7 @@ export class MonitorRepository {
     try {
       const [newMonitor] = await this.db(this.monitorTable)
         .insert({
+          user_id: inputMonitor.userId,
           periodicity_id: inputMonitor.periodicityId,
           name: inputMonitor.name,
           description: inputMonitor.description,

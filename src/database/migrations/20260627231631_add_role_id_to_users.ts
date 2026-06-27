@@ -1,6 +1,6 @@
 import type { Knex } from 'knex';
 
-const MIGRATION_NAME = "20260622224103_add_role_to_users";
+const MIGRATION_NAME = "20260627231631_add_role_id_to_users";
 
 export async function up(knex: Knex): Promise<void> {
   console.log(`[MIGRATION] ${MIGRATION_NAME}: Adding role_id foreign key to users.`);

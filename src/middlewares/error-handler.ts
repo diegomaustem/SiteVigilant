@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
+import { AppError } from '../utils/errors.js';
 
 export const errorHandler = (
   err: any,
@@ -6,10 +7,14 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  console.error('Erro capturado:', err.stack);
+  console.error('Erro capturado:', err);
 
-  let status = 500;
-  let message = err.message || 'Erro interno do servidor';
+  if (err instanceof AppError) {
+    return res.status(err.status).json({
+      success: false,
+      message: err.message,
+    });
+  }
 
   if (
     err.name === 'ValidationError' ||
@@ -17,19 +22,24 @@ export const errorHandler = (
     err.code === '23502' ||
     err.code === '22P02'
   ) {
-    status = 400;
-    message = 'Dados inválidos ou mal formatados.';
-  } 
-  else if (
-    err.code === '23505' ||
-    err.code === '23503' 
-  ) {
-    status = 409;
-    message = 'Conflito: recurso já existe ou referência inválida.';
+    return res.status(400).json({
+      success: false,
+      message: 'Dados inválidos ou mal formatados.',
+    });
   }
 
-  res.status(status).json({
+  if (
+    err.code === '23505' ||
+    err.code === '23503'
+  ) {
+    return res.status(409).json({
+      success: false,
+      message: 'Conflito: recurso já existe ou referência inválida.',
+    });
+  }
+
+  return res.status(500).json({
     success: false,
-    message,
+    message: 'Erro interno do servidor.',
   });
 };

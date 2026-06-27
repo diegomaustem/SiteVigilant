@@ -8,6 +8,7 @@ declare global {
       userId?: number;
       userEmail?: string;
       userName?: string;
+      userRole?: string;
     }
   }
 }
@@ -16,18 +17,19 @@ export function authMiddleware(authService: AuthService) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedError('Token não fornecido');
+      throw new UnauthorizedError('Token não fornecido.');
     }
 
     const token = authHeader.split(' ')[1];
     if (!token) {
-        throw new UnauthorizedError('Token não fornecido ou mal formatado');
+        throw new UnauthorizedError('Token não fornecido ou mal formatado.');
     }
 
     const payload = authService.verifyToken(token);
     req.userId = payload.userId;
     req.userEmail = payload.email;
     req.userName = payload.name;
+    req.userRole = payload.role;
     next();
   };
 }

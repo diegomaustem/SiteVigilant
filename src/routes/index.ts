@@ -5,7 +5,7 @@ import { authMiddleware } from '../middlewares/auth.middleware.js';
 import { loginLimiter, registerLimiter } from '../middlewares/rate-limit.middleware.js';
 import { AuthValidator } from '../validators/auth-validator.js';
 
-import { authController, monitorController } from '../config/container.js';
+import { authController, monitorController, userController } from '../config/container.js';
 import { MonitorValidator } from '../validators/monitor-validator.js';
 import { periodicityController } from '../config/container.js';
 import { PeriodicityValidator } from '../validators/periodicity-validator.js';
@@ -28,5 +28,11 @@ router.post('/create-monitor', authGuard, MonitorValidator.validateCheckInput, a
 router.get('/list-periodicities', authGuard, asyncHandler(periodicityController.getAll));
 router.get('/list-periodicity/:id', authGuard, asyncHandler(periodicityController.getById)); 
 router.post('/create-periodicity', authGuard, PeriodicityValidator.validateCheckInput, asyncHandler(periodicityController.create));
+
+router.get('/users', authGuard, asyncHandler(userController.getAll));
+router.get('/user/:id', authGuard, asyncHandler(userController.getById));
+router.post('/user', authGuard, asyncHandler(userController.create));
+router.put('/user/:id', authGuard, asyncHandler(userController.update));
+router.delete('/user/:id', authGuard, asyncHandler(userController.delete));
 
 export default router;

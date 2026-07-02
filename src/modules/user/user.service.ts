@@ -50,8 +50,7 @@ export class UserService {
             }
         }
 
-        const updated = await this.userRepository.update(id, data);
-        return this.toResponse(updated);
+        return this.toResponse(await this.userRepository.update(id, data));
     }
 
     async delete(id: number): Promise<boolean> {
@@ -62,13 +61,7 @@ export class UserService {
     }
 
     private toResponse(user: User): UserResponse {
-        return {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role_id: user.role_id,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-        };
+        const { passwordHash, ...rest } = user;
+        return rest;
     }
 }

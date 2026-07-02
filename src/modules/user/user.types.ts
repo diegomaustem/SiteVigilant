@@ -3,19 +3,17 @@ export interface User {
   email: string;
   name: string;
   passwordHash: string;
+  roleId: number;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface InputUser {
-  email: string;
+export type InputUser = Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'passwordHash'> & {
   password: string;
-  name: string;
-}
+};
 
-export interface UserResponse {
-  id: number;
-  email: string;
-  name: string;
-  createdAt: Date;
-}
+export type UpdateUser = Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'passwordHash'>> & {
+  password?: string;
+};
+
+export type UserResponse = Omit<User, 'passwordHash'>;

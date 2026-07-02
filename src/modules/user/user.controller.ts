@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express';
-import { BadRequestError } from '../../utils/errors.js';
 import type { UserService } from './user.service.js';
-import type { InputUser, UpdateUser, User } from './user.types.js';
+import type { InputUser, UpdateUser } from './user.types.js';
 
 export class UserController {
     private readonly userService: UserService;
@@ -26,7 +25,7 @@ export class UserController {
             email: req.body.email,
             name: req.body.name,
             password: req.body.password,
-            role_id: req.body.role_id
+            roleId: req.body.role_id
         };
 
         const user = await this.userService.create(userData);
@@ -38,7 +37,7 @@ export class UserController {
         const updateData : UpdateUser = {
             name: req.body.name,
             email: req.body.email,
-            role_id: req.body.role_id,
+            roleId: req.body.role_id,
             password: req.body.password
         };
 

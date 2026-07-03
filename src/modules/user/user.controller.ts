@@ -11,7 +11,7 @@ export class UserController {
 
     getAll = async (req: Request, res: Response): Promise<void> => {
         const users = await this.userService.getAll();
-        res.json({ success: true, data: users });
+        res.status(200).json({ success: true, data: users });
     } 
 
     getById = async (req: Request, res: Response): Promise<void> => {

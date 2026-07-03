@@ -11,17 +11,7 @@ export class MonitorRepository {
 
   async getAll(): Promise<Monitor[]>{
     try {
-      const monitors = await this.db(this.monitorTable).select('*');
-      return monitors.map(monitor => ({
-        id: monitor.id,
-        userId: monitor.user_id,
-        periodicityId: monitor.periodicity_id,
-        name: monitor.name,
-        description: monitor.description,
-        url: monitor.url,
-        createdAt: monitor.created_at,
-        updatedAt: monitor.updated_at,
-      }));
+      return await this.db(this.monitorTable).select('*');
     } catch (error: any) {
       console.error(`[MonitorRepository.getAll] Erro ao buscar monitores: ${error.message}`);
       throw error;
@@ -34,16 +24,7 @@ export class MonitorRepository {
         .where({ id })
         .first();
       if (!monitor) return undefined;
-      return {
-        id: monitor.id,
-        userId: monitor.user_id,
-        periodicityId: monitor.periodicity_id,
-        name: monitor.name,
-        description: monitor.description,
-        url: monitor.url,
-        createdAt: monitor.created_at,
-        updatedAt: monitor.updated_at,
-      };
+      return monitor;
     } catch (error: any) {
       console.error(`[MonitorRepository.getById] Erro ao buscar monitor por id: ${error.message}`);
       throw error;
@@ -57,17 +38,7 @@ export class MonitorRepository {
         .first();
 
       if (!monitor) return undefined;
-
-      return {
-        id: monitor.id,
-        userId: monitor.user_id,
-        periodicityId: monitor.periodicity_id,
-        name: monitor.name,
-        description: monitor.description,
-        url: monitor.url,
-        createdAt: monitor.created_at,
-        updatedAt: monitor.updated_at,
-      };
+      return monitor;
     } catch (error: any) {
       console.error(`[MonitorRepository.getByName] Erro ao buscar monitor por nome: ${error.message}`);
       throw error;
@@ -88,6 +59,37 @@ export class MonitorRepository {
       return newMonitor;
     } catch (error: any) {
       console.error(`[MonitorRepository.create] Erro ao inserir monitor: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async update(id: number, data: InputMonitor): Promise<Monitor> {
+    try {
+      const updateData: any = {};
+      if (data.userId) updateData.user_id = data.userId;
+      if (data.periodicityId) updateData.periodicity_id = data.periodicityId;
+      if (data.name) updateData.name = data.name;
+      if (data.description) updateData.description = data.description;
+      if (data.url) updateData.url = data.url;
+                
+      const [updated] = await this.db(this.monitorTable)
+        .where({ id })
+        .update(updateData)
+        .returning('*');
+    
+      return updated;
+    } catch(error: any) {
+      console.error(`[MonitorRepository.update] Erro ao atualizar monitor: ${error.message}`);
+      throw error;
+    }
+  }
+    
+  async delete(id: number): Promise<boolean> {
+    try {
+      const deleted = await this.db(this.monitorTable).where({ id }).del();
+      return deleted > 0;
+    } catch(error: any) {
+      console.error(`[MonitorRepository.delete] Erro ao deletar monitor: ${error.message}`);
       throw error;
     }
   }

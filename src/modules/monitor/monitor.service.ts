@@ -1,4 +1,4 @@
-import { ConflictError, NotFoundError, UnauthorizedError } from '../../utils/errors.js';
+import { BadRequestError, ConflictError, NotFoundError } from '../../utils/errors.js';
 import { MonitorRepository } from './monitor.repository.js';
 import type { InputMonitor, Monitor } from './monitor.types.js';
 export class MonitorService {
@@ -35,5 +35,23 @@ export class MonitorService {
       }
       throw error;
     }
+  }
+
+  async update(id: number, data: InputMonitor): Promise<Monitor> {
+    if (isNaN(id) || id <= 0) {
+      throw new BadRequestError('ID inválido. Deve ser um número inteiro.');
+    }
+    
+    const existingMonitor = await this.monitorRepository.getById(id);
+    if (!existingMonitor) throw new NotFoundError('Monitor não encontrado para atualização.');
+        
+    return await this.monitorRepository.update(id, data);
+  }
+    
+  async delete(id: number): Promise<boolean> {
+    const existingMonitor = await this.monitorRepository.getById(id); 
+    if(!existingMonitor) throw new NotFoundError('Monitor não encontrado para deleção.');
+                
+    return await this.monitorRepository.delete(id);
   }
 }

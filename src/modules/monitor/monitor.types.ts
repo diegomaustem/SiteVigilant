@@ -1,18 +1,15 @@
-export interface InputMonitor {
-    userId: number;
-    periodicityId: number;
-    name: string;
-    description: string;
-    url: string;    
+export interface MonitorBase {
+  userId: number;
+  periodicityId: number;
+  name: string;
+  description: string;
+  url: string;
 }
 
-export interface Monitor {
-    id: number;
-    userId: number;
-    periodicityId: number;
-    name: string;
-    description: string;
-    url: string;
-    createdAt : Date;
-    updatedAt: Date;
+export interface InputMonitor extends MonitorBase {}
+
+export interface Monitor extends MonitorBase {
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
 }

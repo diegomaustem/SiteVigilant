@@ -35,5 +35,25 @@ export class MonitorController {
 
         const createdMonitor = await this.monitorService.create(monitorData); 
         res.status(201).json({ success: true, data: createdMonitor });
-    }   
+    } 
+    
+    update = async (req: Request, res: Response): Promise<void> => {
+        const id = Number(req.params.id);
+        const updateData : InputMonitor = {
+            userId: req.body.userId,
+            periodicityId: req.body.periodicityId,
+            name: req.body.name,
+            description: req.body.description,
+            url: req.body.url
+        };
+        
+        const monitorUpdated = await this.monitorService.update(id, updateData);
+        res.status(200).json({ success: true, message: 'Monitor atualizado com sucesso.', data: monitorUpdated });
+    }
+        
+    delete = async (req: Request, res: Response): Promise<void> => {
+        const id = Number(req.params.id);
+        await this.monitorService.delete(id);
+        res.status(200).json({ success: true, message: 'Monitor deletado com sucesso.' });
+    }
 }

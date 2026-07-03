@@ -1,12 +1,9 @@
 export interface InputPeriodicity {
-    time: string
-    status: boolean
+  time: string;
+  status: boolean;
 }
-
-export interface Periodicity {
-    id: number;
-    time: string
-    status: boolean
-    createdAt : Date;
-    updatedAt: Date;
+export interface Periodicity extends InputPeriodicity {
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
 }

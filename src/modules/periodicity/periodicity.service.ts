@@ -1,4 +1,4 @@
-import { ConflictError, NotFoundError } from '../../utils/errors.js';
+import { BadRequestError, ConflictError, NotFoundError } from '../../utils/errors.js';
 import { PeriodicityRepository } from './periodicity.repository.js';
 import type { InputPeriodicity, Periodicity } from './periodicity.types.js';
 
@@ -27,7 +27,7 @@ export class PeriodicityService {
     try {
       const existingPeriodicity = await this.periodicityRepository.getByTime(inputPeriodicity.time); 
       if (existingPeriodicity) {
-        throw new ConflictError('Já existe um periodo cadastrado com este periodo. Escolha outro, por favor.');
+        throw new ConflictError('Já existe um periodo cadastrado com este valor. Escolha outro, por favor.');
       }
       
       return await this.periodicityRepository.create(inputPeriodicity);
@@ -37,5 +37,28 @@ export class PeriodicityService {
       }
       throw error;
     }
+  }
+
+  async update(id: number, data: InputPeriodicity): Promise<Periodicity> {
+    if (isNaN(id) || id <= 0) {
+      throw new BadRequestError('ID inválido. Deve ser um número inteiro.');
+    }
+  
+    const existingPeriodicity = await this.periodicityRepository.getById(id);
+    if (!existingPeriodicity) throw new NotFoundError('Periodicidade não encontrada para atualização.');
+      
+    const periodicityWithSameTime = await this.periodicityRepository.getByTime(data.time);
+    if (periodicityWithSameTime && periodicityWithSameTime.id !== id) {
+      throw new ConflictError('Já existe uma periodicidade cadastrada com este valor. Escolha outro, por favor.');
+    }
+  
+    return await this.periodicityRepository.update(id, data);
+  }
+  
+  async delete(id: number): Promise<boolean> {
+    const existingPeriodicity = await this.periodicityRepository.getById(id); 
+    if(!existingPeriodicity) throw new NotFoundError('Periodicidade não encontrada para deleção.');
+              
+    return await this.periodicityRepository.delete(id);
   }
 }

@@ -21,9 +21,11 @@ router.get('/status', (req: Request, res: Response) => {
 router.post('/register', registerLimiter, AuthValidator.validateRegister, asyncHandler(authController.register));
 router.post('/login', loginLimiter, AuthValidator.validateLogin, asyncHandler(authController.login));
 
-router.get('/list-monitors', authGuard, asyncHandler(monitorController.getAll));
-router.get('/list-monitor/:id', authGuard, asyncHandler(monitorController.getById));
-router.post('/create-monitor', authGuard, MonitorValidator.validateCheckInput, asyncHandler(monitorController.create));
+router.get('/monitors', authGuard, asyncHandler(monitorController.getAll));
+router.get('/monitor/:id', authGuard, asyncHandler(monitorController.getById));
+router.post('/monitor', authGuard,MonitorValidator.validateCheckInput, asyncHandler(monitorController.create));
+router.put('/monitor/:id', authGuard,MonitorValidator.validateCheckInput, asyncHandler(monitorController.update));
+router.delete('/monitor/:id', authGuard, asyncHandler(monitorController.delete));
 
 router.get('/periodicities', authGuard, asyncHandler(periodicityController.getAll));
 router.get('/periodicity/:id', authGuard, asyncHandler(periodicityController.getById)); 

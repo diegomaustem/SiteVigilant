@@ -20,17 +20,11 @@ export class PeriodicityRepository {
 
   async getById(id: number): Promise<Periodicity | undefined> {
     try {
-        const periodicity = await this.db(this.periodicityTable)
-          .where({ id })
-          .first();
-        if (!periodicity) return undefined;
-        return {
-          id: periodicity.id,
-          time: periodicity.time,
-          status: periodicity.status,
-          createdAt: periodicity.created_at,
-          updatedAt: periodicity.updated_at,
-        };
+      const periodicity = await this.db(this.periodicityTable)
+        .where({ id })
+        .first();
+      if (!periodicity) return undefined;
+      return periodicity;
     } catch (error: any) {
       console.error(`[PeriodicityRepository.getById] Erro ao buscar periodo por id: ${error.message}`);
       throw error;
@@ -42,18 +36,10 @@ export class PeriodicityRepository {
       const periodicity = await this.db(this.periodicityTable)
         .where('time', time)
         .first();
-  
       if (!periodicity) return undefined;
-  
-      return {
-        id: periodicity.id,
-        time: periodicity.time,
-        status: periodicity.status,
-        createdAt: periodicity.created_at,
-        updatedAt: periodicity.updated_at,
-      };
+      return periodicity;
     } catch (error: any) {
-      console.error(`[PeriodicityRepository.getByTime] Erro ao buscar periodo pelo periodo: ${error.message}`);
+      console.error(`[PeriodicityRepository.getByTime] Erro ao buscar periodo pelo nome: ${error.message}`);
       throw error;
     }
   }
@@ -67,15 +53,37 @@ export class PeriodicityRepository {
         })
         .returning('*'); 
 
-      return {
-        id: newPeriodicity.id,
-        time: newPeriodicity.time,
-        status: newPeriodicity.status,
-        createdAt: newPeriodicity.created_at,
-        updatedAt: newPeriodicity.updated_at,
-      };
+      return newPeriodicity;
     } catch (error: any) {
       console.error(`[PeriodicityRepository.create] Erro ao inserir periodicidade: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async update(id: number, data: InputPeriodicity): Promise<Periodicity> {
+    try {
+      const updateData: any = {};
+      if (data.time) updateData.time = data.time;
+      if (data.status) updateData.status = data.status;
+              
+      const [updated] = await this.db(this.periodicityTable)
+        .where({ id })
+        .update(updateData)
+        .returning('*');
+  
+      return updated;
+    } catch(error: any) {
+      console.error(`[PeriodicityRepository.update] Erro ao atualizar periodicidade: ${error.message}`);
+      throw error;
+    }
+  }
+  
+  async delete(id: number): Promise<boolean> {
+    try {
+      const deleted = await this.db(this.periodicityTable).where({ id }).del();
+      return deleted > 0;
+    } catch(error: any) {
+      console.error(`[PeriodicityRepository.delete] Erro ao deletar periodicidade: ${error.message}`);
       throw error;
     }
   }

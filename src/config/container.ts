@@ -12,6 +12,8 @@ import { LogRepository } from '../modules/logs/log.repository.js';
 import { UserRepository } from '../modules/user/user.repository.js';
 import { AuthService } from '../modules/auth/auth.service.js';
 import { AuthController } from '../modules/auth/auth.controller.js';
+import { UserService } from '../modules/user/user.service.js';
+import { UserController } from '../modules/user/user.controller.js';
 
 class DependencyContainer {
   private static dbCache: Knex | null = null;
@@ -30,6 +32,9 @@ class DependencyContainer {
   private static userRepositoryCache: UserRepository | null = null;
   private static authServiceCache: AuthService | null = null;
   private static authControllerCache: AuthController | null = null;
+
+  private static userServiceCache: UserService | null = null;
+  private static userControllerCache: UserController | null = null;
 
   public static get db(): Knex {
     if (!this.dbCache) {
@@ -120,6 +125,20 @@ class DependencyContainer {
     return this.authControllerCache;
   }
 
+  public static get userService(): UserService {
+    if (!this.userServiceCache) {
+      this.userServiceCache = new UserService(this.userRepository);
+    }
+    return this.userServiceCache;
+  }
+
+  public static get userController(): UserController {
+    if (!this.userControllerCache) {
+      this.userControllerCache = new UserController(this.userService);
+    }
+    return this.userControllerCache;
+  }
+
   public static async destroyDb(): Promise<void> {
     if (this.dbCache) {
       await this.dbCache.destroy();
@@ -141,6 +160,9 @@ export const urlConsultantService = DependencyContainer.urlConsultantService;
 
 export const authController = DependencyContainer.authController;
 export const authService = DependencyContainer.authService;
+
 export const userRepository = DependencyContainer.userRepository;
+export const userService = DependencyContainer.userService;
+export const userController = DependencyContainer.userController;
 
 export default DependencyContainer;

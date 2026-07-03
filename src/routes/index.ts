@@ -25,9 +25,11 @@ router.get('/list-monitors', authGuard, asyncHandler(monitorController.getAll));
 router.get('/list-monitor/:id', authGuard, asyncHandler(monitorController.getById));
 router.post('/create-monitor', authGuard, MonitorValidator.validateCheckInput, asyncHandler(monitorController.create));
 
-router.get('/list-periodicities', authGuard, asyncHandler(periodicityController.getAll));
-router.get('/list-periodicity/:id', authGuard, asyncHandler(periodicityController.getById)); 
-router.post('/create-periodicity', authGuard, PeriodicityValidator.validateCheckInput, asyncHandler(periodicityController.create));
+router.get('/periodicities', authGuard, asyncHandler(periodicityController.getAll));
+router.get('/periodicity/:id', authGuard, asyncHandler(periodicityController.getById)); 
+router.post('/periodicity', authGuard, PeriodicityValidator.validateCheckInput, asyncHandler(periodicityController.create));
+router.put('/periodicity/:id', authGuard, PeriodicityValidator.validateCheckInput, asyncHandler(periodicityController.update));
+router.delete('/periodicity/:id', authGuard, asyncHandler(periodicityController.delete));
 
 router.get('/users', authGuard, asyncHandler(userController.getAll));
 router.get('/user/:id', authGuard, asyncHandler(userController.getById));

@@ -18,23 +18,24 @@ import { UserController } from '../modules/user/user.controller.js';
 class DependencyContainer {
   private static dbCache: Knex | null = null;
 
+  private static monitorRepositoryCache: MonitorRepository | null = null;
   private static monitorServiceCache: MonitorService | null = null;
   private static monitorControllerCache: MonitorController | null = null;
-  private static monitorRepositoryCache: MonitorRepository | null = null;
 
+  private static periodicityRepositoryCache: PeriodicityRepository | null = null;
   private static periodicityServiceCache: PeriodicityService | null = null;
   private static periodicityControllerCache: PeriodicityController | null = null;
-  private static periodicityRepositoryCache: PeriodicityRepository | null = null;
 
-  private static urlConsultantServiceCache: UrlConsultantService | null = null;
   private static logRepositoryCache: LogRepository | null = null;
+  
+  private static urlConsultantServiceCache: UrlConsultantService | null = null;
 
   private static userRepositoryCache: UserRepository | null = null;
-  private static authServiceCache: AuthService | null = null;
-  private static authControllerCache: AuthController | null = null;
-
   private static userServiceCache: UserService | null = null;
   private static userControllerCache: UserController | null = null;
+
+  private static authServiceCache: AuthService | null = null;
+  private static authControllerCache: AuthController | null = null;
 
   public static get db(): Knex {
     if (!this.dbCache) {
@@ -111,20 +112,6 @@ class DependencyContainer {
     return this.userRepositoryCache;
   }
 
-  public static get authService(): AuthService {
-    if (!this.authServiceCache) {
-      this.authServiceCache = new AuthService(this.userRepository);
-    }
-    return this.authServiceCache;
-  }
-
-  public static get authController(): AuthController {
-    if (!this.authControllerCache) {
-      this.authControllerCache = new AuthController(this.authService);
-    }
-    return this.authControllerCache;
-  }
-
   public static get userService(): UserService {
     if (!this.userServiceCache) {
       this.userServiceCache = new UserService(this.userRepository);
@@ -139,6 +126,20 @@ class DependencyContainer {
     return this.userControllerCache;
   }
 
+  public static get authService(): AuthService {
+    if (!this.authServiceCache) {
+      this.authServiceCache = new AuthService(this.userRepository);
+    }
+    return this.authServiceCache;
+  }
+
+  public static get authController(): AuthController {
+    if (!this.authControllerCache) {
+      this.authControllerCache = new AuthController(this.authService);
+    }
+    return this.authControllerCache;
+  }
+
   public static async destroyDb(): Promise<void> {
     if (this.dbCache) {
       await this.dbCache.destroy();
@@ -148,21 +149,24 @@ class DependencyContainer {
 }
 
 export const db = DependencyContainer.db;
-export const monitorController  = DependencyContainer.monitorController;
-export const monitorService     = DependencyContainer.monitorService;
-export const monitorRepository  = DependencyContainer.monitorRepository;
+
+export const monitorController = DependencyContainer.monitorController;
+export const monitorService = DependencyContainer.monitorService;
+export const monitorRepository = DependencyContainer.monitorRepository;
 
 export const periodicityController = DependencyContainer.periodicityController;
-export const periodicityService    = DependencyContainer.periodicityService;
+export const periodicityService = DependencyContainer.periodicityService;
 export const periodicityRepository = DependencyContainer.periodicityRepository;
 
-export const urlConsultantService = DependencyContainer.urlConsultantService;
+export const logRepository = DependencyContainer.logRepository;
 
-export const authController = DependencyContainer.authController;
-export const authService = DependencyContainer.authService;
+export const urlConsultantService = DependencyContainer.urlConsultantService;
 
 export const userRepository = DependencyContainer.userRepository;
 export const userService = DependencyContainer.userService;
 export const userController = DependencyContainer.userController;
+
+export const authController = DependencyContainer.authController;
+export const authService = DependencyContainer.authService;
 
 export default DependencyContainer;

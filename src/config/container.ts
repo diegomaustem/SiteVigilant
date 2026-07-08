@@ -14,6 +14,8 @@ import { AuthService } from '../modules/auth/auth.service.js';
 import { AuthController } from '../modules/auth/auth.controller.js';
 import { UserService } from '../modules/user/user.service.js';
 import { UserController } from '../modules/user/user.controller.js';
+import { LogService } from '../modules/logs/log.service.js';
+import { LogController } from '../modules/logs/log.controller.js';
 
 class DependencyContainer {
   private static dbCache: Knex | null = null;
@@ -27,6 +29,8 @@ class DependencyContainer {
   private static periodicityControllerCache: PeriodicityController | null = null;
 
   private static logRepositoryCache: LogRepository | null = null;
+  private static logServiceCache: LogService | null = null;
+  private static logControllerCache: LogController | null = null;
   
   private static urlConsultantServiceCache: UrlConsultantService | null = null;
 
@@ -98,6 +102,20 @@ class DependencyContainer {
     return this.logRepositoryCache;
   }
 
+  public static get logService(): LogService {
+    if (!this.logServiceCache) {
+      this.logServiceCache = new LogService(this.logRepository);
+    }
+    return this.logServiceCache;
+  }
+
+  public static get logController(): LogController {
+    if (!this.logControllerCache) {
+      this.logControllerCache = new LogController(this.logService);
+    }
+    return this.logControllerCache;
+  }
+
   public static get urlConsultantService(): UrlConsultantService {
     if (!this.urlConsultantServiceCache) {
       this.urlConsultantServiceCache = new UrlConsultantService(this.logRepository, this.periodicityRepository);
@@ -159,6 +177,8 @@ export const periodicityService = DependencyContainer.periodicityService;
 export const periodicityRepository = DependencyContainer.periodicityRepository;
 
 export const logRepository = DependencyContainer.logRepository;
+export const logServicee = DependencyContainer.logService;
+export const logController = DependencyContainer.logController;
 
 export const urlConsultantService = DependencyContainer.urlConsultantService;
 

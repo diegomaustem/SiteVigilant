@@ -8,7 +8,7 @@ declare global {
       userId?: number;
       userEmail?: string;
       userName?: string;
-      userRole?: string;
+      userRole?: number | string;
     }
   }
 }
@@ -29,7 +29,7 @@ export function authMiddleware(authService: AuthService) {
     req.userId = payload.userId;
     req.userEmail = payload.email;
     req.userName = payload.name;
-    req.userRole = payload.role;
+    req.userRole = payload.roleId;
     next();
   };
 }

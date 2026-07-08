@@ -16,7 +16,8 @@ export class AuthService {
         if (existingUser) {
             throw new ConflictError('E-mail já cadastrado. Por favor, tente outro.');
         }
-        return await this.userRepository.create({ email, password, name });
+        const roleIdDefault = 1
+        return await this.userRepository.create({ email, password, name, roleId: roleIdDefault });
     }
 
     async login(email: string, password: string): Promise<{ user: UserResponse; token: string }> {
@@ -40,15 +41,16 @@ export class AuthService {
         user: {
             id: user.id,
             email: user.email,
-            role: user.role,
+            roleId: user.roleId,
             name: user.name,
             createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
         },
         token,
         };
     }
 
-    verifyToken(token: string): { userId: number; email: string; name: string, role: string } {
+    verifyToken(token: string): { userId: number; email: string; name: string, roleId: number } {
         try {
             return jwt.verify(token, ENV.JWT_SECRET) as any;
         } catch {

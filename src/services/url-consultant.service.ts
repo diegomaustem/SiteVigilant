@@ -5,8 +5,8 @@ import type { Monitor } from '../modules/monitor/monitor.types.js';
 import type { PeriodicityRepository } from '../modules/periodicity/periodicity.repository.js';
 
 export interface CheckResult {
-  log: Log;           // log atualizado ou existente
-  wasChecked: boolean; // true se houve nova requisição, false se reutilizou log existente
+  log: Log;
+  wasChecked: boolean;
 }
 
 export class UrlConsultantService {
@@ -20,20 +20,13 @@ export class UrlConsultantService {
 
   async checkAddress(monitor: Monitor): Promise<CheckResult> {
     const monitorLog = await this.logRepository.getLogByMonitorId(monitor.id);
-
     if(monitorLog) {
-      if (!monitor.periodicityId) {
-        throw new Error(`Monitor ${monitor.id} não possui periodicidade associada`);
-      }
-
       const periodicity = await this.periodicityRepository.getById(monitor.periodicityId);
-     
       if(!periodicity) {
         throw new Error(`Periodicidade com ID ${monitor.periodicityId} não encontrada`);
       }
 
       const shouldRun = this.shouldRunCheck(monitorLog.checkedAt, periodicity.time);
-
       if (!shouldRun) {
         return { log: monitorLog, wasChecked: false };
       }
@@ -41,6 +34,7 @@ export class UrlConsultantService {
 
     const startTime = Date.now();
     const logData: InputLog = {
+      ...(monitorLog && { id: monitorLog.id }),
       monitorId: monitor.id,
       url: monitor.url,
       isUp: false,
@@ -50,37 +44,7 @@ export class UrlConsultantService {
       checkedAt: new Date(),
     };
 
-    try {
-      const response = await axios.get(monitor.url, {
-        timeout: 10000,
-        validateStatus: () => true, 
-      });
-
-      const endTime = Date.now();
-      logData.isUp = response.status >= 200 && response.status < 400;
-      logData.statusCode = response.status;
-      logData.responseTimeMs = endTime - startTime;
-    } catch (error) {
-      const endTime = Date.now();
-      logData.responseTimeMs = endTime - startTime;
-      logData.isUp = false;
-
-      if (axios.isAxiosError(error)) {
-        const axiosError = error as AxiosError;
-        if (axiosError.code === 'ECONNABORTED') {
-          logData.errorMessage = 'Timeout ao conectar';
-        } else if (axiosError.response) {
-          logData.statusCode = axiosError.response.status;
-          logData.errorMessage = `Erro HTTP ${axiosError.response.status}`;
-        } else if (axiosError.request) {
-          logData.errorMessage = 'Sem resposta do servidor (DNS/SSL/offline)';
-        } else {
-          logData.errorMessage = axiosError.message;
-        }
-      } else {
-        logData.errorMessage = (error as Error).message || 'Erro desconhecido';
-      }
-    }
+    await this.performHttpCheck(logData, startTime);
 
     const savedLog = await this.logRepository.upsert(logData); 
     return { log: savedLog, wasChecked: true };
@@ -106,6 +70,41 @@ export class UrlConsultantService {
       case 'H': return value * 60 * 60 * 1000;    
       case 'D': return value * 24 * 60 * 60 * 1000; 
       default: return 0; 
+    }
+  }
+
+  private async performHttpCheck(logData: InputLog, startTime: number): Promise<void> {
+    try {
+      const response = await axios.get(logData.url, {
+        timeout: 10000,
+        validateStatus: () => true,
+      });
+      const endTime = Date.now();
+      logData.isUp = response.status >= 200 && response.status < 400;
+      logData.statusCode = response.status;
+      logData.responseTimeMs = endTime - startTime;
+      logData.checkedAt = new Date(endTime);
+    } catch (error) {
+      const endTime = Date.now();
+      logData.responseTimeMs = endTime - startTime;
+      logData.isUp = false;
+      logData.checkedAt = new Date(endTime);
+
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError;
+        if (axiosError.code === 'ECONNABORTED') {
+          logData.errorMessage = 'Timeout ao conectar';
+        } else if (axiosError.response) {
+          logData.statusCode = axiosError.response.status;
+          logData.errorMessage = `Erro HTTP ${axiosError.response.status}`;
+        } else if (axiosError.request) {
+          logData.errorMessage = 'Sem resposta do servidor (DNS/SSL/offline)';
+        } else {
+          logData.errorMessage = axiosError.message;
+        }
+      } else {
+        logData.errorMessage = (error as Error).message || 'Erro desconhecido';
+      }
     }
   }
 }

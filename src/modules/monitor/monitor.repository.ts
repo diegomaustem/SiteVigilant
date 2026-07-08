@@ -11,7 +11,17 @@ export class MonitorRepository {
 
   async getAll(): Promise<Monitor[]>{
     try {
-      return await this.db(this.monitorTable).select('*');
+      const rows = await this.db(this.monitorTable).select('*');
+      return rows.map(row => ({
+        id: row.id,
+        userId: row.user_id,
+        periodicityId: row.periodicity_id,
+        name: row.name,
+        description: row.description,
+        url: row.url,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+      }));
     } catch (error: any) {
       console.error(`[MonitorRepository.getAll] Erro ao buscar monitores: ${error.message}`);
       throw error;

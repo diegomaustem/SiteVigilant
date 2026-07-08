@@ -1,4 +1,4 @@
-export interface InputLog {
+export interface LogBase {
   monitorId: number;
   url: string;
   isUp: boolean;
@@ -8,6 +8,10 @@ export interface InputLog {
   checkedAt: Date;
 }
 
-export interface Log extends InputLog {
+export interface InputLog extends LogBase {
+  id?: number;
+}
+
+export interface Log extends LogBase {
   id: number;
 }

@@ -1,5 +1,6 @@
 import type { Knex } from 'knex';
 import type { InputMonitor, Monitor } from './monitor.types.js';
+import { NotFoundError } from '../../utils/errors.js';
 
 export class MonitorRepository {
   private db: Knex;
@@ -94,10 +95,12 @@ export class MonitorRepository {
     }
   }
     
-  async delete(id: number): Promise<boolean> {
+  async delete(id: number): Promise<void> {
     try {
       const deleted = await this.db(this.monitorTable).where({ id }).del();
-      return deleted > 0;
+      if (deleted === 0) {
+        throw new NotFoundError(`Monitor com ID ${id} não encontrado.`)
+      }
     } catch(error: any) {
       console.error(`[MonitorRepository.delete] Erro ao deletar monitor: ${error.message}`);
       throw error;

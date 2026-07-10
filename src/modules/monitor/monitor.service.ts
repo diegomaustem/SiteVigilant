@@ -27,7 +27,6 @@ export class MonitorService {
       if (existingMonitor) {
         throw new ConflictError('Já existe um monitor cadastrado com este nome. Escolha outro, por favor.');
       }
-
       return await this.monitorRepository.create(inputMonitor);
     }catch(error: any) {
       if (!(error instanceof ConflictError)) {
@@ -48,10 +47,10 @@ export class MonitorService {
     return await this.monitorRepository.update(id, data);
   }
     
-  async delete(id: number): Promise<boolean> {
-    const existingMonitor = await this.monitorRepository.getById(id); 
-    if(!existingMonitor) throw new NotFoundError('Monitor não encontrado para deleção.');
-                
-    return await this.monitorRepository.delete(id);
+  async delete(id: number): Promise<void> { 
+    if (isNaN(id)) {
+      throw new BadRequestError('ID inválido. Deve ser um número inteiro.');
+    }               
+    await this.monitorRepository.delete(id);
   }
 }

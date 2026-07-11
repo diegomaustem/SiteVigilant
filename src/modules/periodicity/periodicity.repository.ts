@@ -1,5 +1,6 @@
 import type { Knex } from 'knex';
 import type { Periodicity, InputPeriodicity } from './periodicity.types.js';
+import { NotFoundError } from '../../utils/errors.js';
 
 export class PeriodicityRepository {
   private db: Knex;
@@ -78,10 +79,12 @@ export class PeriodicityRepository {
     }
   }
   
-  async delete(id: number): Promise<boolean> {
+  async delete(id: number): Promise<void> {
     try {
       const deleted = await this.db(this.periodicityTable).where({ id }).del();
-      return deleted > 0;
+      if(deleted === 0) {
+        throw new NotFoundError(`Periodicidade com ID ${id} não encontrada.`);
+      }
     } catch(error: any) {
       console.error(`[PeriodicityRepository.delete] Erro ao deletar periodicidade: ${error.message}`);
       throw error;

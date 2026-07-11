@@ -55,10 +55,10 @@ export class PeriodicityService {
     return await this.periodicityRepository.update(id, data);
   }
   
-  async delete(id: number): Promise<boolean> {
+  async delete(id: number): Promise<void> {
     const existingPeriodicity = await this.periodicityRepository.getById(id); 
     if(!existingPeriodicity) throw new NotFoundError('Periodicidade não encontrada para deleção.');
               
-    return await this.periodicityRepository.delete(id);
+    await this.periodicityRepository.delete(id);
   }
 }

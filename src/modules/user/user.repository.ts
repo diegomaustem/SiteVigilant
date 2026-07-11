@@ -1,6 +1,7 @@
 import type { Knex } from 'knex';
 import type { User, InputUser, UpdateUser, UserResponse} from './user.types.js'
 import bcrypt from 'bcrypt';
+import { NotFoundError } from '../../utils/errors.js';
 
 export class UserRepository {
     private db: Knex;
@@ -83,10 +84,12 @@ export class UserRepository {
         }
     }
 
-    async delete(id: number): Promise<boolean> {
+    async delete(id: number): Promise<void> {
         try {
             const deleted = await this.db(this.userTable).where({ id }).del();
-            return deleted > 0;
+            if(deleted === 0) {
+                throw new NotFoundError(`Usuário com ID ${id} não encontrado.`);
+            }
         } catch(error: any) {
             console.error(`[UserRepository.delete] Erro ao deletar usuário: ${error.message}`);
             throw error;

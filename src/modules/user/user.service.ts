@@ -53,11 +53,11 @@ export class UserService {
         return this.toResponse(await this.userRepository.update(id, data));
     }
 
-    async delete(id: number): Promise<boolean> {
+    async delete(id: number): Promise<void> {
         const existingUser = await this.userRepository.getById(id); 
         if(!existingUser) throw new NotFoundError('Usuário não encontrado para deleção.');
             
-        return await this.userRepository.delete(id);
+        await this.userRepository.delete(id);
     }
 
     private toResponse(user: User): UserResponse {

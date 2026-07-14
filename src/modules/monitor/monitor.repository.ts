@@ -11,99 +11,78 @@ export class MonitorRepository {
   }
 
   async getAll(): Promise<Monitor[]>{
-    try {
-      const rows = await this.db(this.monitorTable).select('*');
-      return rows.map(row => ({
-        id: row.id,
-        userId: row.user_id,
-        periodicityId: row.periodicity_id,
-        name: row.name,
-        description: row.description,
-        url: row.url,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-      }));
-    } catch (error: any) {
-      console.error(`[MonitorRepository.getAll] Erro ao buscar monitores: ${error.message}`);
-      throw error;
-    }
+    const rows = await this.db(this.monitorTable).select('*');
+    return rows.map(row => ({
+      id: row.id,
+      userId: row.user_id,
+      periodicityId: row.periodicity_id,
+      name: row.name,
+      description: row.description,
+      url: row.url,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    }));
   }
 
-  async getById(id: number): Promise<Monitor | undefined> {
-    try {
-      const monitor = await this.db(this.monitorTable)
-        .where({ id })
-        .first();
-      if (!monitor) return undefined;
-      return monitor;
-    } catch (error: any) {
-      console.error(`[MonitorRepository.getById] Erro ao buscar monitor por id: ${error.message}`);
-      throw error;
+  async getById(id: number): Promise<Monitor> {
+    const monitor = await this.db(this.monitorTable)
+      .where({ id })
+      .first();
+
+    if (!monitor) {
+      throw new NotFoundError(`Monitor com ID ${id} não encontrado.`);
     }
+    return monitor;
   }
 
-  async getByName(name: string): Promise<Monitor | undefined> {
-    try {
-      const monitor = await this.db(this.monitorTable)
-        .where('name', name)
-        .first();
+  async getByName(name: string): Promise<Monitor> {
+    const monitor = await this.db(this.monitorTable)
+      .where('name', name)
+      .first();
 
-      if (!monitor) return undefined;
-      return monitor;
-    } catch (error: any) {
-      console.error(`[MonitorRepository.getByName] Erro ao buscar monitor por nome: ${error.message}`);
-      throw error;
+    if (!monitor) {
+      throw new NotFoundError(`Monitor com nome ${name} não encontrado.`);
     }
+    return monitor;
   }
 
   async create(inputMonitor: InputMonitor): Promise<Monitor> {
-    try {
-      const [newMonitor] = await this.db(this.monitorTable)
-        .insert({
-          user_id: inputMonitor.userId,
-          periodicity_id: inputMonitor.periodicityId,
-          name: inputMonitor.name,
-          description: inputMonitor.description,
-          url: inputMonitor.url
-        })
-        .returning('*'); 
-      return newMonitor;
-    } catch (error: any) {
-      console.error(`[MonitorRepository.create] Erro ao inserir monitor: ${error.message}`);
-      throw error;
-    }
+    const [newMonitor] = await this.db(this.monitorTable)
+      .insert({
+        user_id: inputMonitor.userId,
+        periodicity_id: inputMonitor.periodicityId,
+        name: inputMonitor.name,
+        description: inputMonitor.description,
+        url: inputMonitor.url
+      })
+      .returning('*'); 
+    return newMonitor;
   }
 
   async update(id: number, data: InputMonitor): Promise<Monitor> {
-    try {
-      const updateData: any = {};
-      if (data.userId) updateData.user_id = data.userId;
-      if (data.periodicityId) updateData.periodicity_id = data.periodicityId;
-      if (data.name) updateData.name = data.name;
-      if (data.description) updateData.description = data.description;
-      if (data.url) updateData.url = data.url;
+    const updateData: any = {};
+    if (data.userId) updateData.user_id = data.userId;
+    if (data.periodicityId) updateData.periodicity_id = data.periodicityId;
+    if (data.name) updateData.name = data.name;
+    if (data.description) updateData.description = data.description;
+    if (data.url) updateData.url = data.url;
                 
-      const [updated] = await this.db(this.monitorTable)
-        .where({ id })
-        .update(updateData)
-        .returning('*');
+    const [updated] = await this.db(this.monitorTable)
+      .where({ id })
+      .update(updateData)
+      .returning('*');
     
-      return updated;
-    } catch(error: any) {
-      console.error(`[MonitorRepository.update] Erro ao atualizar monitor: ${error.message}`);
-      throw error;
+    if (!updated) {
+      throw new NotFoundError(`Monitor com ID ${id} não encontrado`);
     }
+
+    return updated;
   }
     
   async delete(id: number): Promise<void> {
-    try {
-      const deleted = await this.db(this.monitorTable).where({ id }).del();
-      if (deleted === 0) {
-        throw new NotFoundError(`Monitor com ID ${id} não encontrado.`)
-      }
-    } catch(error: any) {
-      console.error(`[MonitorRepository.delete] Erro ao deletar monitor: ${error.message}`);
-      throw error;
+    const deleted = await this.db(this.monitorTable).where({ id }).del();
+    if (deleted === 0) {
+      throw new NotFoundError(`Monitor com ID ${id} não encontrado.`)
     }
   }
 }

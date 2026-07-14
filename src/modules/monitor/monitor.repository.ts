@@ -34,16 +34,11 @@ export class MonitorRepository {
     }
     return monitor;
   }
-
-  async getByName(name: string): Promise<Monitor> {
-    const monitor = await this.db(this.monitorTable)
+   
+  async getByName(name: string): Promise<Monitor | undefined> {
+    return await this.db(this.monitorTable)
       .where('name', name)
       .first();
-
-    if (!monitor) {
-      throw new NotFoundError(`Monitor com nome ${name} não encontrado.`);
-    }
-    return monitor;
   }
 
   async create(inputMonitor: InputMonitor): Promise<Monitor> {

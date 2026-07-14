@@ -73,7 +73,7 @@ export class MonitorRepository {
       .returning('*');
     
     if (!updated) {
-      throw new NotFoundError(`Monitor com ID ${id} não encontrado`);
+      throw new NotFoundError(`Monitor com ID ${id} não encontrado.`);
     }
 
     return updated;

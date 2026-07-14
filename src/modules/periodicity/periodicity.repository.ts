@@ -11,83 +11,61 @@ export class PeriodicityRepository {
   }
 
   async getAll(): Promise<Periodicity[]> {
-    try {
-      return await this.db<Periodicity>(this.periodicityTable).select('*');
-    } catch (error: any) {
-      console.error(`[PeriodicityRepository.getAll] Erro ao buscar periodicidades: ${error.message}`);
-      throw error;
-    }
+    return await this.db<Periodicity>(this.periodicityTable).select('*');
   }
 
-  async getById(id: number): Promise<Periodicity | undefined> {
-    try {
-      const periodicity = await this.db(this.periodicityTable)
-        .where({ id })
-        .first();
-      if (!periodicity) return undefined;
-      return periodicity;
-    } catch (error: any) {
-      console.error(`[PeriodicityRepository.getById] Erro ao buscar periodo por id: ${error.message}`);
-      throw error;
+  async getById(id: number): Promise<Periodicity> {
+    const periodicity = await this.db(this.periodicityTable)
+      .where({ id })
+      .first();
+
+    if (!periodicity) {
+      throw new NotFoundError(`Periodicidade com ID ${id} não encontrado.`);
     }
+    return periodicity;
   }
 
-  async getByTime(time: string): Promise<Periodicity | undefined> {
-    try {
-      const periodicity = await this.db(this.periodicityTable)
-        .where('time', time)
-        .first();
-      if (!periodicity) return undefined;
-      return periodicity;
-    } catch (error: any) {
-      console.error(`[PeriodicityRepository.getByTime] Erro ao buscar periodo pelo nome: ${error.message}`);
-      throw error;
+  async getByTime(time: string): Promise<Periodicity> {
+    const periodicity = await this.db(this.periodicityTable)
+      .where('time', time)
+      .first();
+
+    if (!periodicity) {
+      throw new NotFoundError(`Periodicidade com time ${time} não encontrado.`);
     }
+    return periodicity;
   }
 
   async create(inputPeriodicity: InputPeriodicity): Promise<Periodicity> {
-    try {
-      const [newPeriodicity] = await this.db(this.periodicityTable)
-        .insert({
-          time: inputPeriodicity.time,
-          status: inputPeriodicity.status
-        })
-        .returning('*'); 
-
-      return newPeriodicity;
-    } catch (error: any) {
-      console.error(`[PeriodicityRepository.create] Erro ao inserir periodicidade: ${error.message}`);
-      throw error;
-    }
+    const [newPeriodicity] = await this.db(this.periodicityTable)
+      .insert({
+        time: inputPeriodicity.time,
+        status: inputPeriodicity.status
+      })
+      .returning('*'); 
+    return newPeriodicity;
   }
 
   async update(id: number, data: InputPeriodicity): Promise<Periodicity> {
-    try {
-      const updateData: any = {};
-      if (data.time) updateData.time = data.time;
-      if (data.status) updateData.status = data.status;
+    const updateData: any = {};
+    if (data.time) updateData.time = data.time;
+    if (data.status) updateData.status = data.status;
               
-      const [updated] = await this.db(this.periodicityTable)
-        .where({ id })
-        .update(updateData)
-        .returning('*');
-  
-      return updated;
-    } catch(error: any) {
-      console.error(`[PeriodicityRepository.update] Erro ao atualizar periodicidade: ${error.message}`);
-      throw error;
+    const [updated] = await this.db(this.periodicityTable)
+      .where({ id })
+      .update(updateData)
+      .returning('*');
+
+    if (!updated) {
+      throw new NotFoundError(`Periodicidade com ID ${id} não encontrado para atualizar.`);
     }
+    return updated;
   }
   
   async delete(id: number): Promise<void> {
-    try {
-      const deleted = await this.db(this.periodicityTable).where({ id }).del();
-      if(deleted === 0) {
-        throw new NotFoundError(`Periodicidade com ID ${id} não encontrada.`);
-      }
-    } catch(error: any) {
-      console.error(`[PeriodicityRepository.delete] Erro ao deletar periodicidade: ${error.message}`);
-      throw error;
+    const deleted = await this.db(this.periodicityTable).where({ id }).del();
+    if(deleted === 0) {
+      throw new NotFoundError(`Periodicidade com ID ${id} não encontrada.`);
     }
   }
 }

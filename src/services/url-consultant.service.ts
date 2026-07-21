@@ -3,10 +3,19 @@ import { LogRepository } from '../modules/logs/log.repository.js';
 import type { InputLog, Log } from '../modules/logs/log.types.js';
 import type { Monitor } from '../modules/monitor/monitor.types.js';
 import type { PeriodicityRepository } from '../modules/periodicity/periodicity.repository.js';
+import { NotFoundError } from '../utils/errors.js';
 
 export interface CheckResult {
   log: Log;
   wasChecked: boolean;
+}
+
+interface HttpCheckResult {
+  isUp: boolean;
+  statusCode?: number;
+  responseTimeMs: number;
+  checkedAt: Date;
+  errorMessage?: string;
 }
 
 export class UrlConsultantService {
@@ -23,7 +32,7 @@ export class UrlConsultantService {
     if(monitorLog) {
       const periodicity = await this.periodicityRepository.getById(monitor.periodicityId);
       if(!periodicity) {
-        throw new Error(`Periodicidade com ID ${monitor.periodicityId} não encontrada`);
+        throw new NotFoundError(`Periodicidade com ID ${monitor.periodicityId} não encontrada`);
       }
 
       const shouldRun = this.shouldRunCheck(monitorLog.checkedAt, periodicity.time);

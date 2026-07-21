@@ -14,10 +14,6 @@ import { authService } from '../config/container.js';
 const authGuard = authMiddleware(authService);
 const router: Router = Router();
 
-router.get('/status', (req: Request, res: Response) => {
-  res.status(200).json({ status: 'API running', timestamp: new Date() });
-});
-
 router.post('/register', registerLimiter, AuthValidator.validateRegister, asyncHandler(authController.register));
 router.post('/login', loginLimiter, AuthValidator.validateLogin, asyncHandler(authController.login));
 
@@ -25,7 +21,7 @@ router.get('/monitors', authGuard, asyncHandler(monitorController.getAll));
 router.get('/monitor/:id', authGuard, asyncHandler(monitorController.getById));
 router.post('/monitor', authGuard,MonitorValidator.validateCheckInput, asyncHandler(monitorController.create));
 router.put('/monitor/:id', authGuard,MonitorValidator.validateCheckInput, asyncHandler(monitorController.update));
-router.delete('/monitor/:id', authGuard, asyncHandler(monitorController.delete));
+router.delete('/monitor/:id', asyncHandler(monitorController.delete));
 
 router.get('/periodicities', authGuard, asyncHandler(periodicityController.getAll));
 router.get('/periodicity/:id', authGuard, asyncHandler(periodicityController.getById)); 

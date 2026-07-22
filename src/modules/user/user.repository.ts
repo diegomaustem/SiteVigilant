@@ -1,5 +1,5 @@
 import type { Knex } from 'knex';
-import type { User, InputUser, UpdateUser, UserResponse} from './user.types.js'
+import type { User, UpdateUser, UserResponse, UserCreate} from './user.types.js'
 import { NotFoundError } from '../../utils/errors.js';
 
 export class UserRepository {
@@ -31,7 +31,7 @@ export class UserRepository {
         return this.toDomain(user);
     }
 
-    async create(userData: InputUser): Promise<User> {
+    async create(userData: UserCreate): Promise<User> {
         const [user] = await this.db(this.userTable)
             .insert({
                 email: userData.email,

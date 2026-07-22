@@ -1,6 +1,6 @@
 import { UserRepository } from './user.repository.js';
-import type { User, UpdateUser, UserResponse, InputUser } from './user.types.js';
-import { ConflictError, NotFoundError, BadRequestError } from '../../utils/errors.js';
+import type { User, UpdateUser, UserResponse, InputUser, UserCreate } from './user.types.js';
+import { ConflictError, BadRequestError } from '../../utils/errors.js';
 import bcrypt from 'bcrypt';
 export class UserService {
   constructor(private userRepository: UserRepository) {}
@@ -28,7 +28,16 @@ export class UserService {
             throw new ConflictError('Já existe um usuário cadastrado com este email. Escolha outro, por favor.');
         }
 
-        return this.toResponse(await this.userRepository.create(userData));
+        const passwordHash = await bcrypt.hash(userData.password, 10);
+
+        const userToCreate : UserCreate = {
+            email: userData.email,
+            name: userData.name,
+            passwordHash: passwordHash,
+            roleId: userData.roleId
+        };
+
+        return this.toResponse(await this.userRepository.create(userToCreate));
     }
 
     async update(id: number, data: UpdateUser): Promise<UserResponse> {

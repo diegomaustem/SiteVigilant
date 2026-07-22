@@ -1,5 +1,5 @@
 import { UserRepository } from './user.repository.js';
-import type { User, UpdateUser, UserResponse, InputUser, UserCreate } from './user.types.js';
+import type { User, UpdateUser, UserResponse, InputUser, CreateUser } from './user.types.js';
 import { ConflictError, BadRequestError } from '../../utils/errors.js';
 import bcrypt from 'bcrypt';
 export class UserService {
@@ -30,7 +30,7 @@ export class UserService {
 
         const passwordHash = await bcrypt.hash(userData.password, 10);
 
-        const userToCreate : UserCreate = {
+        const userToCreate : CreateUser = {
             email: userData.email,
             name: userData.name,
             passwordHash: passwordHash,

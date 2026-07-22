@@ -8,7 +8,7 @@ export interface User {
   updatedAt: Date;
 };
 
-export type UserCreate = {
+export type CreateUser = {
   email: string;
   name: string;
   passwordHash: string;

@@ -1,5 +1,5 @@
 import type { Knex } from 'knex';
-import type { User, UpdateUser, UserResponse, UserCreate} from './user.types.js'
+import type { User, UpdateUser, UserResponse, CreateUser} from './user.types.js'
 import { NotFoundError } from '../../utils/errors.js';
 
 export class UserRepository {

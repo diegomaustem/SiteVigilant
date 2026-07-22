@@ -12,12 +12,14 @@ export class AuthService {
     }
 
     async register(email: string, password: string, name: string): Promise<UserResponse> {
-        const existingUser = await this.userRepository.getByEmail(email);
-        if (existingUser) {
+        const user = await this.userRepository.getByEmail(email);
+        if (user) {
             throw new ConflictError('E-mail já cadastrado. Por favor, tente outro.');
         }
         const roleIdDefault = 1
-        return await this.userRepository.create({ email, password, name, roleId: roleIdDefault });
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        return await this.userRepository.create({ email, passwordHash, name, roleId: roleIdDefault });
     }
 
     async login(email: string, password: string): Promise<{ user: UserResponse; token: string }> {

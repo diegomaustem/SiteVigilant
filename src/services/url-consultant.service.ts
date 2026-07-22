@@ -29,18 +29,13 @@ export class UrlConsultantService {
 
   async checkAddress(monitor: Monitor): Promise<CheckResult> {
     const monitorLog = await this.logRepository.getLogByMonitorId(monitor.id);
-    if(monitorLog) {
-      const periodicity = await this.periodicityRepository.getById(monitor.periodicityId);
-      if(!periodicity) {
-        throw new NotFoundError(`Periodicidade com ID ${monitor.periodicityId} não encontrada`);
-      }
-
-      const shouldRun = this.shouldRunCheck(monitorLog.checkedAt, periodicity.time);
-      if (!shouldRun) {
-        return { log: monitorLog, wasChecked: false };
-      }
+    const periodicity = await this.periodicityRepository.getById(monitor.periodicityId);
+      
+    const shouldRun = this.shouldRunCheck(monitorLog.checkedAt, periodicity.time);
+    if (!shouldRun) {
+      return { log: monitorLog, wasChecked: false };
     }
-
+    
     const startTime = Date.now();
     const logData: InputLog = {
       ...(monitorLog && { id: monitorLog.id }),

@@ -3,7 +3,6 @@ import { LogRepository } from '../modules/logs/log.repository.js';
 import type { InputLog, Log } from '../modules/logs/log.types.js';
 import type { Monitor } from '../modules/monitor/monitor.types.js';
 import type { PeriodicityRepository } from '../modules/periodicity/periodicity.repository.js';
-import { NotFoundError } from '../utils/errors.js';
 
 export interface CheckResult {
   log: Log;

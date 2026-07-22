@@ -41,7 +41,11 @@ export class PeriodicityService {
     return this.periodicityRepository.update(id, data);
   }
   
-  async delete(id: number): Promise<void> {       
+  async delete(id: number): Promise<void> {
+    if (isNaN(id) || id <= 0) {
+      throw new BadRequestError('ID inválido.');
+    } 
+
     return this.periodicityRepository.delete(id);
   }
 }

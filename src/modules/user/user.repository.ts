@@ -1,6 +1,5 @@
 import type { Knex } from 'knex';
 import type { User, InputUser, UpdateUser, UserResponse} from './user.types.js'
-import bcrypt from 'bcrypt';
 import { NotFoundError } from '../../utils/errors.js';
 
 export class UserRepository {
@@ -12,87 +11,57 @@ export class UserRepository {
     }
 
     async getAll(): Promise<User[]> {
-        try {
-          const users = await this.db<UserResponse>(this.userTable).select('*');
-          return users.map(this.toDomain);
-        } catch (error: any) {
-          console.error(`[UserRepository.getAll] Erro ao buscar usuários: ${error.message}`);
-          throw error;
-        }
+        const users = await this.db<UserResponse>(this.userTable).select('*');
+        return users.map(this.toDomain);
     }
 
-    async getById(id: number): Promise<User | undefined> {
-        try {
-            const user = await this.db(this.userTable).where({ id }).first();
-            if (!user) return undefined;
-            return this.toDomain(user);
-        } catch(error: any) {
-            console.error(`[UserRepository.getById] Erro ao buscar usuário por id: ${error.message}`);
-            throw error;
+    async getById(id: number): Promise<User> {
+        const user = await this.db(this.userTable).where({ id }).first();
+        if (!user) {
+            throw new NotFoundError(`Usuário com ID ${id} não encontrado.`);
         }
+        return this.toDomain(user);
     }
-
+     
     async getByEmail(email: string): Promise<User | undefined> {
-        try {
-            const user = await this.db(this.userTable).where({ email }).first();
-            if (!user) return undefined;
-
-            return this.toDomain(user);
-        } catch(error: any) {
-            console.error(`[UserRepository.getByEmail] Erro ao buscar usuário por email: ${error.message}`);
-            throw error;
+        const user = await this.db(this.userTable).where({ email }).first();
+        if (!user) { 
+           return undefined; 
         }
+        return this.toDomain(user);
     }
 
     async create(userData: InputUser): Promise<User> {
-        try { 
-            const passwordHash = await bcrypt.hash(userData.password, 10);
-            const [user] = await this.db(this.userTable)
+        const [user] = await this.db(this.userTable)
             .insert({
                 email: userData.email,
                 name: userData.name,
-                password_hash: passwordHash,
+                password_hash: userData.passwordHash,
                 role_id: userData.roleId
             })
             .returning('*');
-            return this.toDomain(user);
-        } catch(error: any) {
-            console.error(`[UserRepository.create] Erro ao criar usuário: ${error.message}`);
-            throw error;
-        }
+
+        return this.toDomain(user);
     }
 
     async update(id: number, data: UpdateUser): Promise<User> {
-        try {
-            const updateData: any = {};
-            if (data.name) updateData.name = data.name;
-            if (data.email) updateData.email = data.email;
-            if (data.roleId) updateData.role_id = data.roleId;
-            if (data.password) {
-                updateData.password_hash = await bcrypt.hash(data.password, 10);
-            }
+        const [updated] = await this.db(this.userTable)
+            .where({ id })
+            .update(data)
+            .returning('*');
+        
+        if (!updated) {
+            throw new NotFoundError(`Usuário com ID ${id} não encontrado para atualização.`);
+        }     
 
-            const [updated] = await this.db(this.userTable)
-                .where({ id })
-                .update(updateData)
-                .returning('*');
-
-            return this.toDomain(updated);
-        } catch(error: any) {
-            console.error(`[UserRepository.update] Erro ao atualizar usuário: ${error.message}`);
-            throw error;
-        }
+        return this.toDomain(updated);
     }
 
     async delete(id: number): Promise<void> {
-        try {
-            const deleted = await this.db(this.userTable).where({ id }).del();
-            if(deleted === 0) {
-                throw new NotFoundError(`Usuário com ID ${id} não encontrado.`);
-            }
-        } catch(error: any) {
-            console.error(`[UserRepository.delete] Erro ao deletar usuário: ${error.message}`);
-            throw error;
+        const deleted = await this.db(this.userTable).where({ id }).del();
+
+        if(deleted === 0) {
+            throw new NotFoundError(`Usuário com ID ${id} não encontrado.`);
         }
     }
 

@@ -33,7 +33,7 @@ export class MonitorService {
   }
     
   async delete(id: number): Promise<void> { 
-    if (isNaN(id)) {
+    if (isNaN(id) || id <= 0) {
       throw new BadRequestError('ID inválido. Deve ser um número inteiro.');
     }               
     await this.monitorRepository.delete(id);

@@ -14,6 +14,14 @@ export class PeriodicityRepository {
     return await this.db<Periodicity>(this.periodicityTable).select('*');
   }
 
+  async getAllPaginated(limit: number, offset: number): Promise<Periodicity[]> {
+    return await this.db<Periodicity>(this.periodicityTable)
+      .select('*')
+      .orderBy('id', 'asc')
+      .limit(limit)
+      .offset(offset);
+  }
+
   async getById(id: number): Promise<Periodicity> {
     const periodicity = await this.db(this.periodicityTable)
       .where({ id })
@@ -67,5 +75,12 @@ export class PeriodicityRepository {
     if(deleted === 0) {
       throw new NotFoundError(`Periodicidade com ID ${id} não encontrada.`);
     }
+  }
+
+  async count(): Promise<number> {
+    const result = await this.db<Periodicity>(this.periodicityTable)
+      .count<{ total: string | number }>('* as total')
+      .first();
+    return Number(result?.total) || 0;
   }
 }

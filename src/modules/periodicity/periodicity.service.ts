@@ -1,6 +1,6 @@
 import { BadRequestError, ConflictError } from '../../utils/errors.js';
 import { PeriodicityRepository } from './periodicity.repository.js';
-import type { InputPeriodicity, Periodicity } from './periodicity.types.js';
+import type { InputPeriodicity, PaginatedResult, PaginationParams, Periodicity } from './periodicity.types.js';
 
 export class PeriodicityService {
   private readonly periodicityRepository: PeriodicityRepository;
@@ -13,6 +13,30 @@ export class PeriodicityService {
 
   async getAll(): Promise<Periodicity[]> { 
     return await this.periodicityRepository.getAll();
+  }
+
+  async getAllPaginated(params: PaginationParams): Promise<PaginatedResult<Periodicity>> {
+    const { page, limit } = params;
+    const offset = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.periodicityRepository.getAllPaginated(limit, offset),
+      this.periodicityRepository.count(),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasPrevious: page > 1,
+        hasNext: page < totalPages,
+      },
+    };
   }
 
   async getById(periodicityId: number): Promise<Periodicity> {

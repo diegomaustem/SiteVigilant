@@ -24,6 +24,7 @@ router.put('/monitor/:id', authGuard,MonitorValidator.validateCheckInput, asyncH
 router.delete('/monitor/:id', asyncHandler(monitorController.delete));
 
 router.get('/periodicities', authGuard, asyncHandler(periodicityController.getAll));
+router.get('/periodicities-paginated', authGuard, asyncHandler(periodicityController.getAllPaginated));
 router.get('/periodicity/:id', authGuard, asyncHandler(periodicityController.getById)); 
 router.post('/periodicity', authGuard, PeriodicityValidator.validateCheckInput, asyncHandler(periodicityController.create));
 router.put('/periodicity/:id', authGuard, PeriodicityValidator.validateCheckInput, asyncHandler(periodicityController.update));

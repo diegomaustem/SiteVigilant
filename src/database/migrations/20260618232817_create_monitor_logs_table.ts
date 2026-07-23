@@ -9,7 +9,7 @@ export async function up(knex: Knex): Promise<void> {
     if (!exists) {
         await knex.schema.createTable('monitor_logs', (table) => {
             table.increments('id').primary();
-            table.integer('monitor_id').unsigned().notNullable();
+            table.integer('monitor_id').unsigned().notNullable().unique();
             table.string('url').notNullable();
             table.boolean('is_up').notNullable();
             table.integer('status_code').nullable();

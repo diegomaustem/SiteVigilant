@@ -13,7 +13,7 @@ export class PeriodicityController {
 
     getAll = async (req: Request, res: Response): Promise<void> => {
         const periodicities = await this.periodicityService.getAll();
-        res.status(200).json({ success: true, data: periodicities });
+        res.status(200).json({ data: periodicities });
     } 
 
     getById = async (req: Request, res: Response): Promise<void> => {
@@ -22,7 +22,7 @@ export class PeriodicityController {
             throw new BadRequestError('ID inválido. Deve ser um número inteiro.');
         }
         const periodicity = await this.periodicityService.getById(id);
-        res.status(200).json({ success: true, data: periodicity });
+        res.status(200).json({ data: periodicity });
     }
 
     create = async (req: Request, res: Response): Promise<void> => {
@@ -32,7 +32,7 @@ export class PeriodicityController {
         };
 
         const createdPeriodicity = await this.periodicityService.create(periodicityData);
-        res.status(201).json({ success: true, message: 'Periodicidade criada com sucesso.', data: createdPeriodicity });
+        res.status(201).json({ message: 'Periodicidade criada com sucesso.', data: createdPeriodicity });
     }
 
     update = async (req: Request, res: Response): Promise<void> => {
@@ -43,12 +43,12 @@ export class PeriodicityController {
         };
     
         const periodicityUpdated = await this.periodicityService.update(id, updateData);
-        res.status(200).json({ success: true, message: 'Periodicidade atualizada com sucesso.', data: periodicityUpdated });
+        res.status(200).json({ message: 'Periodicidade atualizada com sucesso.', data: periodicityUpdated });
     }
     
     delete = async (req: Request, res: Response): Promise<void> => {
         const id = Number(req.params.id);
         await this.periodicityService.delete(id);
-        res.status(200).json({ success: true, message: 'Periodicidade deletada com sucesso.' });
+        res.status(200).json({ message: 'Periodicidade deletada com sucesso.' });
     }
 }

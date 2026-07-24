@@ -31,7 +31,7 @@ export class UserRepository {
         return this.toDomain(user);
     }
 
-    async create(userData: UserCreate): Promise<User> {
+    async create(userData: CreateUser): Promise<User> {
         const [user] = await this.db(this.userTable)
             .insert({
                 email: userData.email,

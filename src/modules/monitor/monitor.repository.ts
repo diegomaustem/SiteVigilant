@@ -24,6 +24,14 @@ export class MonitorRepository {
     }));
   }
 
+  async getAllPaginated(limit: number, offset: number): Promise<Monitor[]> {
+    return await this.db<Monitor>(this.monitorTable)
+      .select('*')
+      .orderBy('id', 'asc')
+      .limit(limit)
+      .offset(offset);
+  }
+
   async getById(id: number): Promise<Monitor> {
     const monitor = await this.db(this.monitorTable)
       .where({ id })
@@ -79,5 +87,12 @@ export class MonitorRepository {
     if (deleted === 0) {
       throw new NotFoundError(`Monitor com ID ${id} não encontrado.`)
     }
+  }
+
+  async count(): Promise<number> {
+    const result = await this.db<Monitor>(this.monitorTable)
+      .count<{ total: string | number }>('* as total')
+      .first();
+    return Number(result?.total) || 0;
   }
 }

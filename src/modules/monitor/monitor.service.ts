@@ -1,4 +1,5 @@
 import { BadRequestError, ConflictError } from '../../utils/errors.js';
+import type { PaginatedResult, PaginationParams } from '../periodicity/periodicity.types.js';
 import { MonitorRepository } from './monitor.repository.js';
 import type { InputMonitor, Monitor } from './monitor.types.js';
 export class MonitorService {
@@ -10,6 +11,30 @@ export class MonitorService {
 
   async getAll(): Promise<Monitor[]> { 
     return await this.monitorRepository.getAll();
+  }
+
+  async getAllPaginated(params: PaginationParams): Promise<PaginatedResult<Monitor>> {
+      const { page, limit } = params;
+      const offset = (page - 1) * limit;
+  
+      const [data, total] = await Promise.all([
+        this.monitorRepository.getAllPaginated(limit, offset),
+        this.monitorRepository.count(),
+      ]);
+  
+      const totalPages = Math.ceil(total / limit);
+  
+      return {
+        data,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages,
+          hasPrevious: page > 1,
+          hasNext: page < totalPages,
+        },
+      };
   }
 
   async getById(monitorId: number): Promise<Monitor> {

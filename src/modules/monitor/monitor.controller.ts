@@ -15,6 +15,17 @@ export class MonitorController {
         res.status(200).json({ success: true, data: monitors });
     }
 
+    getAllPaginated = async (req: Request, res: Response): Promise<void> => {
+        const MAX_LIMIT = 100;
+        const page = Math.max(1, parseInt(req.query.page as string, 10) || 1);
+
+        let limit = Math.max(1, parseInt(req.query.limit as string, 10) || 10);
+        limit = Math.min(limit, MAX_LIMIT);
+
+        const result = await this.monitorService.getAllPaginated({ page, limit });
+        res.status(200).json(result);
+    }
+
     getById = async (req: Request, res: Response): Promise<void> => {
         const id = Number(req.params.id);
         if (isNaN(id) || id <= 0) {

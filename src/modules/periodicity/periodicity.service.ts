@@ -45,11 +45,12 @@ export class PeriodicityService {
 
   async create(inputPeriodicity: InputPeriodicity): Promise<Periodicity> {
     const existingPeriodicity = await this.periodicityRepository.getByTime(inputPeriodicity.time); 
-    if (existingPeriodicity) {
-      throw new ConflictError('Já existe um periodo cadastrado com este valor. Escolha outro, por favor.');
+    
+    if (!existingPeriodicity) {
+     return await this.periodicityRepository.create(inputPeriodicity);
     }
-      
-    return await this.periodicityRepository.create(inputPeriodicity);
+    
+    throw new ConflictError('Já existe um periodo cadastrado com este valor. Escolha outro, por favor.');
   }
 
   async update(id: number, data: InputPeriodicity): Promise<Periodicity> {

@@ -33,15 +33,12 @@ export class PeriodicityRepository {
     return periodicity;
   }
 
-  async getByTime(time: string): Promise<Periodicity> {
+  async getByTime(time: string): Promise<Periodicity | null> {
     const periodicity = await this.db(this.periodicityTable)
       .where('time', time)
       .first();
 
-    if (!periodicity) {
-      throw new NotFoundError(`Periodicidade com time ${time} não encontrado.`);
-    }
-    return periodicity;
+    return periodicity || null;
   }
 
   async create(inputPeriodicity: InputPeriodicity): Promise<Periodicity> {

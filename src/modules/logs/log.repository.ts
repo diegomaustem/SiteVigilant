@@ -14,6 +14,14 @@ export class LogRepository {
     return await this.db<Log>(this.logsTable).select('*');
   }
 
+  async getAllPaginated(limit: number, offset: number): Promise<Log[]> {
+    return await this.db<Log>(this.logsTable)
+      .select('*')
+      .orderBy('id', 'asc')
+      .limit(limit)
+      .offset(offset);
+  }
+
   async getLogByMonitorId(monitor_id: number): Promise<Log> {
     const log = await this.db(this.logsTable)
       .where({ monitor_id })
@@ -66,5 +74,12 @@ export class LogRepository {
       errorMessage: saved.error_message,
       checkedAt: saved.checked_at,
     };
+  }
+
+  async count(): Promise<number> {
+    const result = await this.db<Log>(this.logsTable)
+      .count<{ total: string | number }>('* as total')
+      .first();
+    return Number(result?.total) || 0;
   }
 }

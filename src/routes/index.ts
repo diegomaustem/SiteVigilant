@@ -18,6 +18,7 @@ router.post('/register', registerLimiter, AuthValidator.validateRegister, asyncH
 router.post('/login', loginLimiter, AuthValidator.validateLogin, asyncHandler(authController.login));
 
 router.get('/monitors', authGuard, asyncHandler(monitorController.getAll));
+router.get('/monitors-paginated', authGuard, asyncHandler(monitorController.getAllPaginated));
 router.get('/monitor/:id', authGuard, asyncHandler(monitorController.getById));
 router.post('/monitor', authGuard,MonitorValidator.validateCheckInput, asyncHandler(monitorController.create));
 router.put('/monitor/:id', authGuard,MonitorValidator.validateCheckInput, asyncHandler(monitorController.update));
@@ -37,5 +38,6 @@ router.put('/user/:id', authGuard, asyncHandler(userController.update));
 router.delete('/user/:id', authGuard, asyncHandler(userController.delete));
 
 router.get('/monitors-log', authGuard, asyncHandler(logController.getAll));
+router.get('/monitors-log-paginated', authGuard, asyncHandler(logController.getAllPaginated));
 
 export default router;

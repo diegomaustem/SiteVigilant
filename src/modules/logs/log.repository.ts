@@ -22,13 +22,13 @@ export class LogRepository {
       .offset(offset);
   }
 
-  async getLogByMonitorId(monitor_id: number): Promise<Log> {
+  async getLogByMonitorId(monitor_id: number): Promise<Log | null> {
     const log = await this.db(this.logsTable)
       .where({ monitor_id })
       .first();
 
     if(!log) {
-      throw new NotFoundError(`Log associado ao monitor id ${monitor_id} não encontrado.`);
+      return null;
     }
     return {
       id: log.id,

@@ -30,7 +30,7 @@ export class UrlConsultantService {
     const monitorLog = await this.logRepository.getLogByMonitorId(monitor.id);
     const periodicity = await this.periodicityRepository.getById(monitor.periodicityId);
       
-    const shouldRun = this.shouldRunCheck(monitorLog.checkedAt, periodicity.time);
+    const shouldRun = !monitorLog || this.shouldRunCheck(monitorLog.checkedAt, periodicity.time);
     if (!shouldRun) {
       return { log: monitorLog, wasChecked: false };
     }

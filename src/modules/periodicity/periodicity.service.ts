@@ -1,14 +1,18 @@
-import { BadRequestError, ConflictError } from '../../utils/errors.js';
+import { BadRequestError, ConflictError, NotFoundError } from '../../utils/errors.js';
+import type { MonitorRepository } from '../monitor/monitor.repository.js';
 import { PeriodicityRepository } from './periodicity.repository.js';
 import type { InputPeriodicity, PaginatedResult, PaginationParams, Periodicity } from './periodicity.types.js';
 
 export class PeriodicityService {
   private readonly periodicityRepository: PeriodicityRepository;
+  private readonly monitorRepository: MonitorRepository;
 
   constructor(
     periodicityRepository: PeriodicityRepository,
+    monitorRepository: MonitorRepository
   ) {
     this.periodicityRepository = periodicityRepository;
+    this.monitorRepository = monitorRepository;
   }
 
   async getAll(): Promise<Periodicity[]> { 
@@ -71,6 +75,20 @@ export class PeriodicityService {
       throw new BadRequestError('ID inválido.');
     } 
 
+    await this.periodicityRepository.getById(id);
+
+    const monitorsCount = await this.getMonitorsCount(id);
+      if (monitorsCount > 0) {
+        throw new ConflictError(
+          `Não é possível excluir esta periodicidade. Ela está sendo usada por ${monitorsCount} monitor(es).`
+      );
+    }
+  
     return this.periodicityRepository.delete(id);
   }
+
+  private async getMonitorsCount(periodicityId: number): Promise<number> {
+    const monitors = await this.monitorRepository.getAll();
+    return monitors.filter(monitor => monitor.periodicityId === periodicityId).length;
+  } 
 }

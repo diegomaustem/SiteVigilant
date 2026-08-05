@@ -83,7 +83,7 @@ class DependencyContainer {
 
   public static get periodicityService(): PeriodicityService {
     if (!this.periodicityServiceCache) {
-        this.periodicityServiceCache = new PeriodicityService(this.periodicityRepository);
+      this.periodicityServiceCache = new PeriodicityService(this.periodicityRepository, this.monitorRepository);
     }
     return this.periodicityServiceCache;
   }

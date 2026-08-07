@@ -15,6 +15,14 @@ export class UserRepository {
         return users.map(this.toDomain);
     }
 
+    async getAllPaginated(limit: number, offset: number): Promise<User[]> {
+        return await this.db<User>(this.userTable)
+          .select('*')
+          .orderBy('id', 'asc')
+          .limit(limit)
+          .offset(offset);
+    }
+
     async getById(id: number): Promise<User> {
         const user = await this.db(this.userTable).where({ id }).first();
         if (!user) {
@@ -75,5 +83,12 @@ export class UserRepository {
             createdAt: dbUser.created_at,
             updatedAt: dbUser.updated_at,
         };
+    }
+
+    async count(): Promise<number> {
+        const result = await this.db<User>(this.userTable)
+            .count<{ total: string | number }>('* as total')
+            .first();
+        return Number(result?.total) || 0;
     }
 }

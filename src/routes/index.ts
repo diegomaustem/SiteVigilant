@@ -32,6 +32,7 @@ router.put('/periodicity/:id', authGuard, PeriodicityValidator.validateCheckInpu
 router.delete('/periodicity/:id', authGuard, asyncHandler(periodicityController.delete));
 
 router.get('/users', authGuard, asyncHandler(userController.getAll));
+router.get('/users-paginated', authGuard, asyncHandler(monitorController.getAllPaginated));
 router.get('/user/:id', authGuard, asyncHandler(userController.getById));
 router.post('/user', authGuard, asyncHandler(userController.create));
 router.put('/user/:id', authGuard, asyncHandler(userController.update));

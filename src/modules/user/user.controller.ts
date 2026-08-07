@@ -14,6 +14,17 @@ export class UserController {
         res.status(200).json({ success: true, data: users });
     } 
 
+    getAllPaginated = async (req: Request, res: Response): Promise<void> => {
+        const MAX_LIMIT = 100;
+        const page = Math.max(1, parseInt(req.query.page as string, 10) || 1);
+
+        let limit = Math.max(1, parseInt(req.query.limit as string, 10) || 10);
+        limit = Math.min(limit, MAX_LIMIT);
+
+        const result = await this.userService.getAllPaginated({ page, limit });
+        res.status(200).json(result);
+    };
+
     getById = async (req: Request, res: Response): Promise<void> => {
         const id = Number(req.params.id);
         const user = await this.userService.getById(id);

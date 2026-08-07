@@ -2,12 +2,37 @@ import { UserRepository } from './user.repository.js';
 import type { User, UpdateUser, UserResponse, InputUser, CreateUser } from './user.types.js';
 import { ConflictError, BadRequestError } from '../../utils/errors.js';
 import bcrypt from 'bcrypt';
+import type { PaginatedResult, PaginationParams } from '../periodicity/periodicity.types.js';
 export class UserService {
   constructor(private userRepository: UserRepository) {}
 
     async getAll(): Promise<UserResponse[]> {
         const users = await this.userRepository.getAll();
         return users.map(this.toResponse);
+    }
+
+    async getAllPaginated(params: PaginationParams): Promise<PaginatedResult<User>> {
+        const { page, limit } = params;
+        const offset = (page - 1) * limit;
+    
+        const [data, total] = await Promise.all([
+          this.userRepository.getAllPaginated(limit, offset),
+          this.userRepository.count(),
+        ]);
+    
+        const totalPages = Math.ceil(total / limit);
+    
+        return {
+          data,
+          meta: {
+            total,
+            page,
+            limit,
+            totalPages,
+            hasPrevious: page > 1,
+            hasNext: page < totalPages,
+          },
+        };
     }
 
     async getById(id: number): Promise<UserResponse> {
